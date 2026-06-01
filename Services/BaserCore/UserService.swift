@@ -5,7 +5,18 @@ struct UserService {
     /// ユーザー一覧を取得する
     /// - Returns: ユーザーの配列（該当なしの場合は空配列）
     func getUsers() async throws -> [User] {
-        let res: UsersIndexResponse = try await client.get(route: .users)
+        let res: UsersIndexResponse = try await client.getIndex(route: .users)
         return res.users ?? []
+    }
+
+    /// 単一ユーザーを取得する
+    /// - Parameter id: ユーザー ID
+    /// - Returns: 該当するユーザー
+    func getUser(id: Int) async throws -> User {
+        let res: UserViewResponse = try await client.getView(route: .users, id: id)
+        guard let user = res.user else {
+            throw BcError.invalidResponse
+        }
+        return user
     }
 }

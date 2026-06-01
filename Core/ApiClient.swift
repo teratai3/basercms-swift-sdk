@@ -42,17 +42,31 @@ class ApiClient {
         accessToken = json.accessToken
     }
 
-    /// 認証付き GET リクエストを送信し、JSON をデコードして返す
+    /// 一覧を取得する（GET .../index.json）
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
-    func get<T: Decodable>(route: Route) async throws -> T {
+    func getIndex<T: Decodable>(route: Route) async throws -> T {
+        try await get(path: "\(route.basePath)/index.json")
+    }
+
+    /// 単一リソースを取得する（GET .../view/{id}.json）
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - id: リソースの ID
+    /// - Returns: デコードしたレスポンス
+    func getView<T: Decodable>(route: Route, id: Int) async throws -> T {
+        try await get(path: "\(route.basePath)/view/\(id).json")
+    }
+
+    /// 認証付き GET リクエストを送信し、JSON をデコードして返す
+    /// - Parameter path: ベース URL からの相対パス
+    /// - Returns: デコードしたレスポンス
+    private func get<T: Decodable>(path: String) async throws -> T {
         // トークンを確認
         guard let accessToken = accessToken else {
             throw BcError.authenticationFailed
         }
 
-        // URL を組み立て（/baser/api/admin/{plugin}/{controller}/index.json）
-        let path = "\(route.basePath)/index.json"
         let url = baseURL.appendingPathComponent(path)
 
         // リクエストを作成
