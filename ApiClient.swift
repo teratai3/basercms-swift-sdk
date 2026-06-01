@@ -1,3 +1,5 @@
+import Foundation
+
 /// baserCMS API クライアント
 class ApiClient {
     

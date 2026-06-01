@@ -1,3 +1,5 @@
+import Foundation
+
 /// baserCMS エラー
 enum BcError: LocalizedError {
 
