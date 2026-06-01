@@ -1,16 +1,16 @@
 import Foundation
 
 /// baserCMS API クライアント
-class ApiClient {
-    
+final class ApiClient {
+
     /// 基底 URL
     private let baseURL: URL
-    
+
     /// ログイン用メールアドレス
-    private var email: String
+    private let email: String
 
     /// ログイン用パスワード
-    private var password: String
+    private let password: String
 
     /// アクセストークン
     private var accessToken: String?
@@ -21,24 +21,16 @@ class ApiClient {
         self.email = email
         self.password = password
     }
-    
-    /// ログイン
+
+    /// ログイン（POST .../users/login.json）
     func login() async throws {
-        let url = baseURL.appendingPathComponent("baser/api/admin/baser-core/users/login.json")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let body = ["email": email, "password": password]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        // リクエストを送信
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        // レスポンスを検証
-        let validData = try validate(data: data, response: response)
-
-        let json = try JSONDecoder().decode(LoginResponse.self, from: validData)
-
+        let json: LoginResponse = try await send(
+            path: "baser/api/admin/baser-core/users/login.json",
+            method: "POST",
+            body: body,
+            requiresAuth: false
+        )
         accessToken = json.accessToken
     }
 
@@ -46,7 +38,7 @@ class ApiClient {
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
     func getIndex<T: Decodable>(route: Route) async throws -> T {
-        try await get(path: "\(route.basePath)/index.json")
+        try await send(path: "\(route.basePath)/index.json", method: "GET")
     }
 
     /// 単一リソースを取得する（GET .../view/{id}.json）
@@ -55,26 +47,42 @@ class ApiClient {
     ///   - id: リソースの ID
     /// - Returns: デコードしたレスポンス
     func getView<T: Decodable>(route: Route, id: Int) async throws -> T {
-        try await get(path: "\(route.basePath)/view/\(id).json")
+        try await send(path: "\(route.basePath)/view/\(id).json", method: "GET")
     }
 
-    /// 認証付き GET リクエストを送信し、JSON をデコードして返す
-    /// - Parameter path: ベース URL からの相対パス
+    /// HTTP リクエストを送信し、JSON をデコードして返す
+    /// - Parameters:
+    ///   - path: ベース URL からの相対パス
+    ///   - method: HTTP メソッド
+    ///   - body: リクエストボディ（任意）
+    ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
     /// - Returns: デコードしたレスポンス
-    private func get<T: Decodable>(path: String) async throws -> T {
-        // トークンを確認
-        guard let accessToken = accessToken else {
-            throw BcError.authenticationFailed
-        }
-
+    private func send<T: Decodable>(
+        path: String,
+        method: String,
+        body: Encodable? = nil,
+        requiresAuth: Bool = true
+    ) async throws -> T {
         let url = baseURL.appendingPathComponent(path)
 
         // リクエストを作成
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        // 認証トークンを付与
+        if requiresAuth {
+            guard let accessToken = accessToken else {
+                throw BcError.authenticationFailed
+            }
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
+        // ボディを付与
+        if let body = body {
+            request.httpBody = try JSONEncoder().encode(AnyEncodable(body))
+        }
 
         // リクエストを送信
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -97,5 +105,18 @@ class ApiClient {
         }
 
         return data
+    }
+}
+
+/// 任意の Encodable を JSONEncoder に渡すための型消去ラッパー
+private struct AnyEncodable: Encodable {
+    private let encodeClosure: (Encoder) throws -> Void
+
+    init(_ value: Encodable) {
+        self.encodeClosure = value.encode
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeClosure(encoder)
     }
 }
