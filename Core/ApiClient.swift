@@ -24,11 +24,11 @@ final class ApiClient {
 
     /// ログイン（POST .../users/login.json）
     func login() async throws {
-        let body = ["email": email, "password": password]
+        let httpBody = try JSONEncoder().encode(["email": email, "password": password])
         let json: LoginResponse = try await send(
             path: "baser/api/admin/baser-core/users/login.json",
             method: "POST",
-            body: body,
+            httpBody: httpBody,
             requiresAuth: false
         )
         accessToken = json.accessToken
@@ -54,13 +54,13 @@ final class ApiClient {
     /// - Parameters:
     ///   - path: ベース URL からの相対パス
     ///   - method: HTTP メソッド
-    ///   - body: リクエストボディ（任意）
+    ///   - httpBody: リクエストボディ（任意）
     ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
     /// - Returns: デコードしたレスポンス
     private func send<T: Decodable>(
         path: String,
         method: String,
-        body: Encodable? = nil,
+        httpBody: Data? = nil,
         requiresAuth: Bool = true
     ) async throws -> T {
         let url = baseURL.appendingPathComponent(path)
@@ -80,8 +80,8 @@ final class ApiClient {
         }
 
         // ボディを付与
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(AnyEncodable(body))
+        if let httpBody = httpBody {
+            request.httpBody = httpBody
         }
 
         // リクエストを送信
@@ -105,23 +105,5 @@ final class ApiClient {
         }
 
         return data
-    }
-}
-
-/// 任意の Encodable を JSONEncoder に渡すための型消去ラッパー
-private struct AnyEncodable: Encodable {
-    /// 型情報を捨て、エンコード処理だけをクロージャとして保持する
-    private let encodeClosure: (Encoder) throws -> Void
-
-    init(_ value: Encodable) {
-        // value.encode は value.encode(to:) のメソッド参照
-        // ここでクロージャに閉じ込めることで、型情報が不要になる
-        self.encodeClosure = value.encode
-    }
-
-    func encode(to encoder: Encoder) throws {
-        // 保存したクロージャに encoder を渡して呼ぶだけ
-        // 実態は元の値の encode(to:) が動く
-        try encodeClosure(encoder)
     }
 }
