@@ -31,10 +31,10 @@ class ApiClient {
         let body = ["email": email, "password": password]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        /// リクエストを送信
+        // リクエストを送信
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        /// レスポンスを検証
+        // レスポンスを検証
         let validData = try validate(data: data, response: response)
 
         let json = try JSONDecoder().decode(LoginResponse.self, from: validData)
@@ -46,26 +46,26 @@ class ApiClient {
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
     func get<T: Decodable>(route: Route) async throws -> T {
-        /// トークンを確認
+        // トークンを確認
         guard let accessToken = accessToken else {
             throw BcError.authenticationFailed
         }
 
-        /// URL を組み立て（/baser/api/admin/{plugin}/{controller}/index.json）
+        // URL を組み立て（/baser/api/admin/{plugin}/{controller}/index.json）
         let path = "\(route.basePath)/index.json"
         let url = baseURL.appendingPathComponent(path)
 
-        /// リクエストを作成
+        // リクエストを作成
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
-        /// リクエストを送信
+        // リクエストを送信
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        /// レスポンスを検証
+        // レスポンスを検証
         let validData = try validate(data: data, response: response)
 
         return try JSONDecoder().decode(T.self, from: validData)
