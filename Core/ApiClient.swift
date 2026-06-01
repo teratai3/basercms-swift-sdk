@@ -110,13 +110,18 @@ final class ApiClient {
 
 /// 任意の Encodable を JSONEncoder に渡すための型消去ラッパー
 private struct AnyEncodable: Encodable {
+    /// 型情報を捨て、エンコード処理だけをクロージャとして保持する
     private let encodeClosure: (Encoder) throws -> Void
 
     init(_ value: Encodable) {
+        // value.encode は value.encode(to:) のメソッド参照
+        // ここでクロージャに閉じ込めることで、型情報が不要になる
         self.encodeClosure = value.encode
     }
 
     func encode(to encoder: Encoder) throws {
+        // 保存したクロージャに encoder を渡して呼ぶだけ
+        // 実態は元の値の encode(to:) が動く
         try encodeClosure(encoder)
     }
 }
