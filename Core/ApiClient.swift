@@ -75,7 +75,7 @@ final class ApiClient {
 
     // クエリーパラメーターでurlが失敗する可能性があるので、guardでチェック
     guard let url = components.url else {
-      throw BcError.invalidResponse
+      throw BcError.invalidURL
     }
 
     // リクエストを作成

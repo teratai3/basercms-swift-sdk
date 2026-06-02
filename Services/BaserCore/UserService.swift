@@ -15,7 +15,7 @@ struct UserService {
     func getUser(id: Int) async throws -> User {
         let res: UserViewResponse = try await client.getView(route: .users, id: id)
         guard let user = res.user else {
-            throw BcError.invalidResponse
+            throw BcError.notFound(resource: "ユーザー", identifier: String(id))
         }
         return user
     }
@@ -25,8 +25,8 @@ struct UserService {
     /// - Returns: 該当するユーザー
     func getUserByEmail(email: String) async throws -> User {
         let res: UsersIndexResponse = try await client.getIndex(route: .users, query: ["email": email])
-        guard let user = res.users?.first else {
-            throw BcError.invalidResponse
+        guard let user = users?.first else {
+            throw BcError.notFound(resource: "ユーザー", identifier: email)
         }
         return user
     }
