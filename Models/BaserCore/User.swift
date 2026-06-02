@@ -5,10 +5,10 @@ struct User: Codable {
     let id: Int
 
     /// ユーザー名
-    let name: String
+    let name: String?
 
     /// ユーザー名（実名1）
-    let realName1: String?
+    let realName1: String
 
     /// ユーザー名（実名2）
     let realName2: String?

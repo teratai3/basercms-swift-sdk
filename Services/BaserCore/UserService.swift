@@ -25,9 +25,17 @@ struct UserService {
     /// - Returns: 該当するユーザー
     func getUserByEmail(email: String) async throws -> User {
         let res: UsersIndexResponse = try await client.getIndex(route: .users, query: ["email": email])
-        guard let user = users?.first else {
+        guard let user = res.users?.first else {
             throw BcError.notFound(resource: "ユーザー", identifier: email)
         }
         return user
+    }
+
+    /// ユーザーを追加する
+    /// - Parameter request: 追加するユーザーの情報
+    /// - Returns: 追加したユーザー
+    func addUser(_ request: UserAddRequest) async throws -> User {
+        let res: UserAddResponse = try await client.add(route: .users, data: request)
+        return res.user
     }
 }

@@ -50,6 +50,16 @@ final class ApiClient {
     try await send(path: "\(route.basePath)/view/\(id).json", method: "GET")
   }
 
+  /// リソースを追加する（POST .../add.json）
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - data: リソースのデータ
+  /// - Returns: デコードしたレスポンス
+  func add<T: Encodable, R: Decodable>(route: Route, data: T) async throws -> R {
+    let httpBody = try JSONEncoder().encode(data)
+    return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody)
+  }
+
   /// HTTP リクエストを送信し、JSON をデコードして返す
   /// - Parameters:
   ///   - path: ベース URL からの相対パス
