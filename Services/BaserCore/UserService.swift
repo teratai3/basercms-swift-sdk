@@ -35,7 +35,22 @@ struct UserService {
     /// - Parameter request: 追加するユーザーの情報
     /// - Returns: 追加したユーザー
     func addUser(_ request: UserAddRequest) async throws -> User {
-        let res: UserAddResponse = try await client.add(route: .users, data: request)
-        return res.user
+        let res: UserSaveResponse = try await client.add(route: .users, data: request)
+        guard let user = res.user else {
+            throw BcError.notFound(resource: "ユーザー", identifier: request.email)
+        }
+        return user
+    }
+
+    /// ユーザーを編集する
+    /// - Parameter id: ユーザー ID
+    /// - Parameter request: 編集するユーザーの情報
+    /// - Returns: 編集したユーザー
+    func editUser(id: Int, _ request: UserEditRequest) async throws -> User {
+        let res: UserSaveResponse = try await client.edit(route: .users, id: id, data: request)
+        guard let user = res.user else {
+            throw BcError.notFound(resource: "ユーザー", identifier: String(id))
+        }
+        return user
     }
 }

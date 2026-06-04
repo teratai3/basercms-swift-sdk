@@ -60,6 +60,17 @@ final class ApiClient {
     return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody)
   }
 
+  /// リソースを編集する（POST .../edit/{id}.json）
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - id: リソースの ID
+  ///   - data: 編集するリソースのデータ
+  /// - Returns: デコードしたレスポンス
+  func edit<T: Encodable, R: Decodable>(route: Route, id: Int, data: T) async throws -> R {
+    let httpBody = try JSONEncoder().encode(data)
+    return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody)
+  }
+
   /// HTTP リクエストを送信し、JSON をデコードして返す
   /// - Parameters:
   ///   - path: ベース URL からの相対パス
