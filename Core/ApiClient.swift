@@ -93,17 +93,98 @@ final class ApiClient {
     try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST")
   }
 
+  /// リソースをマルチパートフォームデータで追加する（POST .../add.json）
+  ///
+  /// `data` を JSON エンコードし、各フィールドを multipart のテキストパートに変換する。
+  /// `nil` の Optional フィールドは JSON で `null` になるため変換時に除外される。
+  ///
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - data: Encodable なリクエスト。CodingKeys で定義したキー名がそのままフィールド名になる
+  ///   - file: アップロードするファイル。`nil` の場合はテキストフィールドのみ送信する
+  /// - Returns: デコードしたレスポンス
+  func addMultipart<T: Encodable, R: Decodable>(
+    route: Route,
+    data: T,
+    file: (name: String, data: Data, fileName: String, mimeType: String)? = nil
+  ) async throws -> R {
+    // Encodable → JSON → [String: Any] の順に変換してフィールド名と値を取り出す。
+    // JSONEncoder が CodingKeys のキー名を保証するため、ここで明示的なマッピングは不要。
+    let jsonData = try JSONEncoder().encode(data)
+    let jsonObject = (try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]) ?? [:]
+
+    // NSNull（nil 由来）は除外し、String / 数値のみ文字列化してフィールドに追加する
+    let fields: [(name: String, value: String?)] = jsonObject.compactMap { key, value in
+      switch value {
+      case let s as String:   return (key, s)
+      case let n as NSNumber: return (key, n.stringValue)
+      default:                return nil  // NSNull など
+      }
+    }
+
+    let boundary = "Boundary-\(UUID().uuidString)"
+    let body = buildMultipartBody(boundary: boundary, fields: fields, file: file)
+    return try await send(
+      path: "\(route.basePath)/add.json",
+      method: "POST",
+      httpBody: body,
+      contentType: "multipart/form-data; boundary=\(boundary)"
+    )
+  }
+
+  /// multipart/form-data ボディを RFC 2046 形式で組み立てる
+  ///
+  /// - Parameters:
+  ///   - boundary: パートを区切る境界文字列
+  ///   - fields: テキストフィールドの配列。`value` が `nil` のエントリはスキップする
+  ///   - file: ファイルパート。`nil` の場合はファイルパートを含めない
+  /// - Returns: 完成した HTTP ボディ
+  private func buildMultipartBody(
+    boundary: String,
+    fields: [(name: String, value: String?)],
+    file: (name: String, data: Data, fileName: String, mimeType: String)?
+  ) -> Data {
+    var body = Data()
+
+    // テキストフィールドパート
+    for field in fields {
+      guard let value = field.value else { continue }
+      body.append(Data("--\(boundary)\r\n".utf8))
+      body.append(Data("Content-Disposition: form-data; name=\"\(field.name)\"\r\n".utf8))
+      body.append(Data("\r\n".utf8))
+      body.append(Data(value.utf8))
+      body.append(Data("\r\n".utf8))
+    }
+
+    // ファイルパート
+    if let file = file {
+      body.append(Data("--\(boundary)\r\n".utf8))
+      body.append(Data("Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(file.fileName)\"\r\n".utf8))
+      body.append(Data("Content-Type: \(file.mimeType)\r\n".utf8))
+      body.append(Data("\r\n".utf8))
+      body.append(file.data)
+      body.append(Data("\r\n".utf8))
+    }
+
+    // 終端境界
+    body.append(Data("--\(boundary)--\r\n".utf8))
+    return body
+  }
+
   /// HTTP リクエストを送信し、JSON をデコードして返す
   /// - Parameters:
   ///   - path: ベース URL からの相対パス
   ///   - method: HTTP メソッド
   ///   - httpBody: リクエストボディ（任意）
+  ///   - contentType: Content-Type ヘッダー（デフォルト: application/json）
   ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
+  ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
   private func send<T: Decodable>(
     path: String,
     method: String,
     httpBody: Data? = nil,
+    contentType: String = "application/json",
     requiresAuth: Bool = true,
     query: [String: String] = [:]
   ) async throws -> T {
@@ -124,7 +205,7 @@ final class ApiClient {
     // リクエストを作成
     var request = URLRequest(url: url)
     request.httpMethod = method
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue(contentType, forHTTPHeaderField: "Content-Type")
     request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
 
     // 認証トークンを付与

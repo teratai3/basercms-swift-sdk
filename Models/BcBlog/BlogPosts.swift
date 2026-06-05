@@ -15,7 +15,7 @@ struct BlogPost: Codable {
     let detailDraft: String?
     let publishBegin: String?
     let publishEnd: String?
-    let excludeSearch: Bool
+    let excludeSearch: Bool?
     let eyeCatch: String?
     let created: String?
     let modified: String?

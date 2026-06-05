@@ -1,3 +1,5 @@
+import Foundation
+
 /// ブログ記事関連の API を扱うサービス
 struct BlogPostsService {
     let client: ApiClient
@@ -16,6 +18,21 @@ struct BlogPostsService {
         let res: BlogPostViewResponse = try await client.getView(route: .blogPosts, id: id)
         guard let blogPost = res.blogPost else {
             throw BcError.notFound(resource: "ブログ記事", identifier: String(id))
+        }
+        return blogPost
+    }
+
+    /// ブログ記事を追加する
+    /// - Parameter request: 追加するブログ記事の情報
+    /// - Returns: 追加したブログ記事
+    func addBlogPost(_ request: BlogPostAddRequest) async throws -> BlogPost {
+        /// アイキャッチ画像を multipart/form-data で送信する
+        let file = request.eyeCatch.map {
+            (name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)
+        }
+        let res: BlogPostAddResponse = try await client.addMultipart(route: .blogPosts, data: request, file: file)
+        guard let blogPost = res.blogPost else {
+            throw BcError.notFound(resource: "ブログ記事", identifier: request.title)
         }
         return blogPost
     }
