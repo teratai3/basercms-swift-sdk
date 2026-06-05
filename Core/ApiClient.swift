@@ -71,6 +71,28 @@ final class ApiClient {
     return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody)
   }
 
+  /// リソースを削除する（POST .../delete/{id}.json）
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - id: リソースの ID
+  func delete(route: Route, id: Int) async throws {
+    // send() はジェネリックで必ず Decodable な型が必要なため、
+    // フィールドを持たないダミー型を用意してデコード先として渡す。
+    // Swift の JSONDecoder は未知のキーを無視するので、
+    // 実際の JSON レスポンスがどんな形でもデコードが成功する。
+    struct Empty: Decodable {}
+    let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST")
+  }
+
+  /// リソースを削除し、レスポンスを返す（POST .../delete/{id}.json）
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - id: リソースの ID
+  /// - Returns: デコードしたレスポンス
+  func delete<R: Decodable>(route: Route, id: Int) async throws -> R {
+    try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST")
+  }
+
   /// HTTP リクエストを送信し、JSON をデコードして返す
   /// - Parameters:
   ///   - path: ベース URL からの相対パス

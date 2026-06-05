@@ -53,4 +53,10 @@ struct UserService {
         }
         return user
     }
+
+    /// ユーザーを削除する
+    /// - Parameter id: ユーザー ID
+    func deleteUser(id: Int) async throws {
+        try await client.delete(route: .users, id: id)
+    }
 }
