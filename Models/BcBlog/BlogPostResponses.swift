@@ -8,3 +8,14 @@ struct BlogPostsIndexResponse: Decodable {
         case message
     }
 }
+
+/// GET .../blog_posts/view/{id}.json のレスポンス
+struct BlogPostViewResponse: Decodable {
+    let blogPost: BlogPost?
+    let message: String?
+
+    enum CodingKeys: String, CodingKey {
+        case blogPost = "blogPost"
+        case message
+    }
+}
