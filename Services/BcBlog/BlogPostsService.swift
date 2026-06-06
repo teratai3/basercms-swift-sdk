@@ -36,4 +36,20 @@ struct BlogPostsService {
         }
         return blogPost
     }
+
+    /// ブログ記事を編集する
+    /// - Parameters:
+    ///   - id: ブログ記事 ID
+    ///   - request: 編集するブログ記事の情報
+    /// - Returns: 編集したブログ記事
+    func editBlogPost(id: Int, _ request: BlogPostEditRequest) async throws -> BlogPost {
+        let file = request.eyeCatch.map {
+            (name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)
+        }
+        let res: BlogPostEditResponse = try await client.editMultipart(route: .blogPosts, id: id, data: request, file: file)
+        guard let blogPost = res.blogPost else {
+            throw BcError.notFound(resource: "ブログ記事", identifier: String(id))
+        }
+        return blogPost
+    }
 }

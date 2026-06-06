@@ -94,10 +94,6 @@ final class ApiClient {
   }
 
   /// リソースをマルチパートフォームデータで追加する（POST .../add.json）
-  ///
-  /// `data` を JSON エンコードし、各フィールドを multipart のテキストパートに変換する。
-  /// `nil` の Optional フィールドは JSON で `null` になるため変換時に除外される。
-  ///
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - data: Encodable なリクエスト。CodingKeys で定義したキー名がそのままフィールド名になる
@@ -108,6 +104,47 @@ final class ApiClient {
     data: T,
     file: (name: String, data: Data, fileName: String, mimeType: String)? = nil
   ) async throws -> R {
+    let (boundary, body) = try buildMultipartRequest(data: data, file: file)
+    return try await send(
+      path: "\(route.basePath)/add.json",
+      method: "POST",
+      httpBody: body,
+      contentType: "multipart/form-data; boundary=\(boundary)"
+    )
+  }
+
+  /// リソースをマルチパートフォームデータで編集する（POST .../edit/{id}.json）
+  /// - Parameters:
+  ///   - route: リソースのルート
+  ///   - id: リソースの ID
+  ///   - data: Encodable なリクエスト。CodingKeys で定義したキー名がそのままフィールド名になる
+  ///   - file: アップロードするファイル。`nil` の場合はテキストフィールドのみ送信する
+  /// - Returns: デコードしたレスポンス
+  func editMultipart<T: Encodable, R: Decodable>(
+    route: Route,
+    id: Int,
+    data: T,
+    file: (name: String, data: Data, fileName: String, mimeType: String)? = nil
+  ) async throws -> R {
+    let (boundary, body) = try buildMultipartRequest(data: data, file: file)
+    return try await send(
+      path: "\(route.basePath)/edit/\(id).json",
+      method: "POST",
+      httpBody: body,
+      contentType: "multipart/form-data; boundary=\(boundary)"
+    )
+  }
+
+  /// Encodable なリクエストを multipart/form-data ボディに変換する
+  ///
+  /// `data` を JSON エンコードし、各フィールドをテキストパートに変換する。
+  /// `nil` の Optional フィールドは JSON で `null` になるため変換時に除外される。
+  ///
+  /// - Returns: (boundary 文字列, HTTP ボディ) のタプル
+  private func buildMultipartRequest<T: Encodable>(
+    data: T,
+    file: (name: String, data: Data, fileName: String, mimeType: String)?
+  ) throws -> (boundary: String, body: Data) {
     // Encodable → JSON → [String: Any] の順に変換してフィールド名と値を取り出す。
     // JSONEncoder が CodingKeys のキー名を保証するため、ここで明示的なマッピングは不要。
     let jsonData = try JSONEncoder().encode(data)
@@ -124,12 +161,7 @@ final class ApiClient {
 
     let boundary = "Boundary-\(UUID().uuidString)"
     let body = buildMultipartBody(boundary: boundary, fields: fields, file: file)
-    return try await send(
-      path: "\(route.basePath)/add.json",
-      method: "POST",
-      httpBody: body,
-      contentType: "multipart/form-data; boundary=\(boundary)"
-    )
+    return (boundary, body)
   }
 
   /// multipart/form-data ボディを RFC 2046 形式で組み立てる
