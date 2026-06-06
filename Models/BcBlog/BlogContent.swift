@@ -6,13 +6,13 @@ struct BlogContent: Codable {
     let listCount: Int?
     let listDirection: String?
     let feedCount: Int?
-    let tagUse: Bool
-    let commentUse: Bool
-    let commentApprove: Bool
-    let authCaptcha: Bool
+    let tagUse: Bool?
+    let commentUse: Bool?
+    let commentApprove: Bool?
+    let authCaptcha: Bool?
     let widgetArea: Int?
     let eyeCatchSize: String?
-    let useContent: Bool
+    let useContent: Bool?
     let created: String?
     let modified: String?
     let content: BlogContentDetail?
@@ -102,16 +102,16 @@ struct BlogSite: Codable {
     let title: String?
     let alias: String?
     let theme: String?
-    let status: Bool
+    let status: Bool?
     let keyword: String?
     let description: String?
-    let useSubdomain: Bool
-    let relateMainSite: Bool
+    let useSubdomain: Bool?
+    let relateMainSite: Bool?
     let device: String?
     let lang: String?
-    let sameMainUrl: Bool
-    let autoRedirect: Bool
-    let autoLink: Bool
+    let sameMainUrl: Bool?
+    let autoRedirect: Bool?
+    let autoLink: Bool?
     let domainType: Int?
     let created: String?
     let modified: String?
