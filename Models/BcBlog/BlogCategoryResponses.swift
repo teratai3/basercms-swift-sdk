@@ -49,11 +49,14 @@ struct BlogCategoryAddResponse: Decodable {
 
 /// POST .../blog_categories/edit/{id}.json のリクエスト
 struct BlogCategoryEditRequest: Encodable {
+    let id: Int
+    let blogContentId: Int
     let name: String?
     let title: String?
 
     enum CodingKeys: String, CodingKey {
-        case name, title
+        case id, name, title
+        case blogContentId = "blog_content_id"
     }
 }
 
