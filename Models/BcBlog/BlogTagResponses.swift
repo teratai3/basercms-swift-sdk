@@ -4,22 +4,12 @@ import Foundation
 struct BlogTagsIndexResponse: Decodable {
     let blogTags: [BlogTag]?
     let message: String?
-
-    enum CodingKeys: String, CodingKey {
-        case blogTags = "blogTags"
-        case message
-    }
 }
 
 /// GET .../blog_tags/view/{id}.json のレスポンス
 struct BlogTagViewResponse: Decodable {
     let blogTag: BlogTag?
     let message: String?
-
-    enum CodingKeys: String, CodingKey {
-        case blogTag = "blogTag"
-        case message
-    }
 }
 
 /// POST .../blog_tags/add.json のリクエスト
@@ -31,11 +21,6 @@ struct BlogTagAddRequest: Encodable {
 struct BlogTagAddResponse: Decodable {
     let blogTag: BlogTag?
     let message: String?
-
-    enum CodingKeys: String, CodingKey {
-        case blogTag = "blogTag"
-        case message
-    }
 }
 
 /// POST .../blog_tags/edit/{id}.json のリクエスト
@@ -47,9 +32,4 @@ struct BlogTagEditRequest: Encodable {
 struct BlogTagEditResponse: Decodable {
     let blogTag: BlogTag?
     let message: String?
-
-    enum CodingKeys: String, CodingKey {
-        case blogTag = "blogTag"
-        case message
-    }
 }
