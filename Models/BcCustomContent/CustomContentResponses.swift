@@ -73,11 +73,13 @@ struct CustomContentEditRequest: Encodable {
     let description: String?
     let template: String?
     let listCount: Int?
+    let listOrder: String?
     let listDirection: String?
 
     enum CodingKeys: String, CodingKey {
         case content, description, template
         case listCount = "list_count"
+        case listOrder = "list_order"
         case listDirection = "list_direction"
     }
 }
