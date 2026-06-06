@@ -52,4 +52,10 @@ struct BlogPostsService {
         }
         return blogPost
     }
+
+    /// ブログ記事を削除する
+    /// - Parameter id: ブログ記事 ID
+    func deleteBlogPost(id: Int) async throws {
+        try await client.delete(route: .blogPosts, id: id)
+    }
 }
