@@ -9,6 +9,9 @@ final class ApiClient {
   /// アクセストークン
   private var accessToken: String?
 
+  /// リフレッシュトークン
+  private var refreshToken: String?
+
   /// コンストラクタ
   init(baseURL: URL) {
     self.baseURL = baseURL
@@ -24,6 +27,28 @@ final class ApiClient {
       requiresAuth: false
     )
     accessToken = json.accessToken
+    refreshToken = json.refreshToken
+  }
+
+  /// アクセストークンをリフレッシュする（GET .../users/refresh_token.json）
+  func refreshAccessToken() async throws {
+    guard let token = refreshToken else {
+      throw BcError.authenticationFailed
+    }
+    let json: LoginResponse = try await send(
+      path: "baser/api/admin/baser-core/users/refresh_token.json",
+      method: "GET",
+      requiresAuth: false,
+      query: ["token": token]
+    )
+    accessToken = json.accessToken
+    refreshToken = json.refreshToken
+  }
+
+  /// ログアウト（トークンをクリアする）
+  func logout() {
+    accessToken = nil
+    refreshToken = nil
   }
 
   /// 一覧を取得する（GET .../index.json）
