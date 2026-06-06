@@ -5,7 +5,26 @@ baserCMS の管理 API を Swift から操作するためのライブラリで�
 ## 動作要件
 
 - Swift 5.9+
+- iOS 15+ / macOS 12+
 - baserCMS 5.x
+
+## インストール
+
+### Swift Package Manager
+
+**Xcode の場合：**
+`File > Add Package Dependencies` でリポジトリの URL を入力してください。
+
+**`Package.swift` がある場合：**
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/teratai3/basercms-swift-sdk.git", from: "1.0.0")
+],
+targets: [
+    .target(name: "MyApp", dependencies: ["BaserCMS"])
+]
+```
 
 ## セットアップ
 
