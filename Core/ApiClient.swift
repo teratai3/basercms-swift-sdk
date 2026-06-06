@@ -46,18 +46,19 @@ final class ApiClient {
   ///   - route: リソースのルート
   ///   - id: リソースの ID
   /// - Returns: デコードしたレスポンス
-  func getView<T: Decodable>(route: Route, id: Int) async throws -> T {
-    try await send(path: "\(route.basePath)/view/\(id).json", method: "GET")
+  func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
+    try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
   }
 
   /// リソースを追加する（POST .../add.json）
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - data: リソースのデータ
+  ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
-  func add<T: Encodable, R: Decodable>(route: Route, data: T) async throws -> R {
+  func add<T: Encodable, R: Decodable>(route: Route, data: T, query: [String: String] = [:]) async throws -> R {
     let httpBody = try JSONEncoder().encode(data)
-    return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody)
+    return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
   }
 
   /// リソースを編集する（POST .../edit/{id}.json）
@@ -65,32 +66,31 @@ final class ApiClient {
   ///   - route: リソースのルート
   ///   - id: リソースの ID
   ///   - data: 編集するリソースのデータ
+  ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
-  func edit<T: Encodable, R: Decodable>(route: Route, id: Int, data: T) async throws -> R {
+  func edit<T: Encodable, R: Decodable>(route: Route, id: Int, data: T, query: [String: String] = [:]) async throws -> R {
     let httpBody = try JSONEncoder().encode(data)
-    return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody)
+    return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
   }
 
   /// リソースを削除する（POST .../delete/{id}.json）
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - id: リソースの ID
-  func delete(route: Route, id: Int) async throws {
-    // send() はジェネリックで必ず Decodable な型が必要なため、
-    // フィールドを持たないダミー型を用意してデコード先として渡す。
-    // Swift の JSONDecoder は未知のキーを無視するので、
-    // 実際の JSON レスポンスがどんな形でもデコードが成功する。
+  ///   - query: クエリパラメーター
+  func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
     struct Empty: Decodable {}
-    let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST")
+    let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
   }
 
   /// リソースを削除し、レスポンスを返す（POST .../delete/{id}.json）
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - id: リソースの ID
+  ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
-  func delete<R: Decodable>(route: Route, id: Int) async throws -> R {
-    try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST")
+  func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
+    try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
   }
 
   /// リソースをマルチパートフォームデータで追加する（POST .../add.json）
