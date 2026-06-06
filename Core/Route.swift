@@ -10,6 +10,7 @@ struct Route: Equatable {
     static let blogContents = Route(plugin: "bc-blog", controller: "blog_contents")
     static let customTables = Route(plugin: "bc-custom-content", controller: "custom_tables")
     static let customEntries = Route(plugin: "bc-custom-content", controller: "custom_entries")
+    static let customFields = Route(plugin: "bc-custom-content", controller: "custom_fields")
 
     /// API のベースパス（/baser/api/admin/{plugin}/{controller}）
     var basePath: String { "baser/api/admin/\(plugin)/\(controller)" }
