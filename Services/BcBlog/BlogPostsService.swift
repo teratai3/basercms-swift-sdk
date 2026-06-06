@@ -26,11 +26,11 @@ struct BlogPostsService {
     /// - Parameter request: 追加するブログ記事の情報
     /// - Returns: 追加したブログ記事
     func addBlogPost(_ request: BlogPostAddRequest) async throws -> BlogPost {
-        /// アイキャッチ画像を multipart/form-data で送信する
-        let file = request.eyeCatch.map {
-            (name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)
-        }
-        let res: BlogPostAddResponse = try await client.addMultipart(route: .blogPosts, data: request, file: file)
+        // アイキャッチ画像があれば multipart/form-data で送信する
+        let files = request.eyeCatch.map {
+            [(name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)]
+        } ?? []
+        let res: BlogPostAddResponse = try await client.add(route: .blogPosts, data: request, files: files)
         guard let blogPost = res.blogPost else {
             throw BcError.notFound(resource: "ブログ記事", identifier: request.title)
         }
@@ -43,10 +43,10 @@ struct BlogPostsService {
     ///   - request: 編集するブログ記事の情報
     /// - Returns: 編集したブログ記事
     func editBlogPost(id: Int, _ request: BlogPostEditRequest) async throws -> BlogPost {
-        let file = request.eyeCatch.map {
-            (name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)
-        }
-        let res: BlogPostEditResponse = try await client.editMultipart(route: .blogPosts, id: id, data: request, file: file)
+        let files = request.eyeCatch.map {
+            [(name: "eye_catch", data: $0.data, fileName: $0.fileName, mimeType: $0.mimeType)]
+        } ?? []
+        let res: BlogPostEditResponse = try await client.edit(route: .blogPosts, id: id, data: request, files: files)
         guard let blogPost = res.blogPost else {
             throw BcError.notFound(resource: "ブログ記事", identifier: String(id))
         }

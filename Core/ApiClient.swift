@@ -51,26 +51,63 @@ final class ApiClient {
   }
 
   /// リソースを追加する（POST .../add.json）
+  /// files が空なら application/json、あれば multipart/form-data で送信する
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - data: リソースのデータ
+  ///   - files: アップロードするファイルの配列（省略時は空）
   ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
-  func add<T: Encodable, R: Decodable>(route: Route, data: T, query: [String: String] = [:]) async throws -> R {
-    let httpBody = try JSONEncoder().encode(data)
-    return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
+  func add<T: Encodable, R: Decodable>(
+    route: Route,
+    data: T,
+    files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
+    query: [String: String] = [:]
+  ) async throws -> R {
+    if files.isEmpty {
+      let httpBody = try JSONEncoder().encode(data)
+      return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
+    } else {
+      let (boundary, body) = try buildMultipartRequest(data: data, files: files)
+      return try await send(
+        path: "\(route.basePath)/add.json",
+        method: "POST",
+        httpBody: body,
+        contentType: "multipart/form-data; boundary=\(boundary)",
+        query: query
+      )
+    }
   }
 
   /// リソースを編集する（POST .../edit/{id}.json）
+  /// files が空なら application/json、あれば multipart/form-data で送信する
   /// - Parameters:
   ///   - route: リソースのルート
   ///   - id: リソースの ID
   ///   - data: 編集するリソースのデータ
+  ///   - files: アップロードするファイルの配列（省略時は空）
   ///   - query: クエリパラメーター
   /// - Returns: デコードしたレスポンス
-  func edit<T: Encodable, R: Decodable>(route: Route, id: Int, data: T, query: [String: String] = [:]) async throws -> R {
-    let httpBody = try JSONEncoder().encode(data)
-    return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
+  func edit<T: Encodable, R: Decodable>(
+    route: Route,
+    id: Int,
+    data: T,
+    files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
+    query: [String: String] = [:]
+  ) async throws -> R {
+    if files.isEmpty {
+      let httpBody = try JSONEncoder().encode(data)
+      return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
+    } else {
+      let (boundary, body) = try buildMultipartRequest(data: data, files: files)
+      return try await send(
+        path: "\(route.basePath)/edit/\(id).json",
+        method: "POST",
+        httpBody: body,
+        contentType: "multipart/form-data; boundary=\(boundary)",
+        query: query
+      )
+    }
   }
 
   /// リソースを削除する（POST .../delete/{id}.json）
@@ -93,92 +130,35 @@ final class ApiClient {
     try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
   }
 
-  /// リソースをマルチパートフォームデータで追加する（POST .../add.json）
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - data: Encodable なリクエスト。CodingKeys で定義したキー名がそのままフィールド名になる
-  ///   - file: アップロードするファイル。`nil` の場合はテキストフィールドのみ送信する
-  /// - Returns: デコードしたレスポンス
-  func addMultipart<T: Encodable, R: Decodable>(
-    route: Route,
-    data: T,
-    file: (name: String, data: Data, fileName: String, mimeType: String)? = nil
-  ) async throws -> R {
-    let (boundary, body) = try buildMultipartRequest(data: data, file: file)
-    return try await send(
-      path: "\(route.basePath)/add.json",
-      method: "POST",
-      httpBody: body,
-      contentType: "multipart/form-data; boundary=\(boundary)"
-    )
-  }
-
-  /// リソースをマルチパートフォームデータで編集する（POST .../edit/{id}.json）
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - id: リソースの ID
-  ///   - data: Encodable なリクエスト。CodingKeys で定義したキー名がそのままフィールド名になる
-  ///   - file: アップロードするファイル。`nil` の場合はテキストフィールドのみ送信する
-  /// - Returns: デコードしたレスポンス
-  func editMultipart<T: Encodable, R: Decodable>(
-    route: Route,
-    id: Int,
-    data: T,
-    file: (name: String, data: Data, fileName: String, mimeType: String)? = nil
-  ) async throws -> R {
-    let (boundary, body) = try buildMultipartRequest(data: data, file: file)
-    return try await send(
-      path: "\(route.basePath)/edit/\(id).json",
-      method: "POST",
-      httpBody: body,
-      contentType: "multipart/form-data; boundary=\(boundary)"
-    )
-  }
-
   /// Encodable なリクエストを multipart/form-data ボディに変換する
-  ///
-  /// `data` を JSON エンコードし、各フィールドをテキストパートに変換する。
-  /// `nil` の Optional フィールドは JSON で `null` になるため変換時に除外される。
-  ///
-  /// - Returns: (boundary 文字列, HTTP ボディ) のタプル
   private func buildMultipartRequest<T: Encodable>(
     data: T,
-    file: (name: String, data: Data, fileName: String, mimeType: String)?
+    files: [(name: String, data: Data, fileName: String, mimeType: String)]
   ) throws -> (boundary: String, body: Data) {
-    // Encodable → JSON → [String: Any] の順に変換してフィールド名と値を取り出す。
-    // JSONEncoder が CodingKeys のキー名を保証するため、ここで明示的なマッピングは不要。
     let jsonData = try JSONEncoder().encode(data)
     let jsonObject = (try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]) ?? [:]
 
-    // NSNull（nil 由来）は除外し、String / 数値のみ文字列化してフィールドに追加する
     let fields: [(name: String, value: String?)] = jsonObject.compactMap { key, value in
       switch value {
       case let s as String:   return (key, s)
       case let n as NSNumber: return (key, n.stringValue)
-      default:                return nil  // NSNull など
+      default:                return nil
       }
     }
 
     let boundary = "Boundary-\(UUID().uuidString)"
-    let body = buildMultipartBody(boundary: boundary, fields: fields, file: file)
+    let body = buildMultipartBody(boundary: boundary, fields: fields, files: files)
     return (boundary, body)
   }
 
   /// multipart/form-data ボディを RFC 2046 形式で組み立てる
-  ///
-  /// - Parameters:
-  ///   - boundary: パートを区切る境界文字列
-  ///   - fields: テキストフィールドの配列。`value` が `nil` のエントリはスキップする
-  ///   - file: ファイルパート。`nil` の場合はファイルパートを含めない
-  /// - Returns: 完成した HTTP ボディ
   private func buildMultipartBody(
     boundary: String,
     fields: [(name: String, value: String?)],
-    file: (name: String, data: Data, fileName: String, mimeType: String)?
+    files: [(name: String, data: Data, fileName: String, mimeType: String)]
   ) -> Data {
     var body = Data()
 
-    // テキストフィールドパート
     for field in fields {
       guard let value = field.value else { continue }
       body.append(Data("--\(boundary)\r\n".utf8))
@@ -188,8 +168,7 @@ final class ApiClient {
       body.append(Data("\r\n".utf8))
     }
 
-    // ファイルパート
-    if let file = file {
+    for file in files {
       body.append(Data("--\(boundary)\r\n".utf8))
       body.append(Data("Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(file.fileName)\"\r\n".utf8))
       body.append(Data("Content-Type: \(file.mimeType)\r\n".utf8))
@@ -198,7 +177,6 @@ final class ApiClient {
       body.append(Data("\r\n".utf8))
     }
 
-    // 終端境界
     body.append(Data("--\(boundary)--\r\n".utf8))
     return body
   }

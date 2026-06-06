@@ -41,11 +41,17 @@ struct CustomEntriesService {
     /// - Parameters:
     ///   - request: 追加するカスタムエントリーの情報
     ///   - customTableId: カスタムテーブル ID
+    ///   - files: アップロードするファイルの配列（カスタムフィールドの画像など）
     /// - Returns: 追加したカスタムエントリー
-    func addCustomEntry(_ request: CustomEntryAddRequest, customTableId: Int) async throws -> CustomEntry {
+    func addCustomEntry(
+        _ request: CustomEntryAddRequest,
+        customTableId: Int,
+        files: [(name: String, data: Data, fileName: String, mimeType: String)] = []
+    ) async throws -> CustomEntry {
         let res: CustomEntryAddResponse = try await client.add(
             route: .customEntries,
             data: request,
+            files: files,
             query: tableQuery(customTableId)
         )
         guard let entry = res.entry else {
@@ -59,12 +65,19 @@ struct CustomEntriesService {
     ///   - id: カスタムエントリー ID
     ///   - request: 編集するカスタムエントリーの情報
     ///   - customTableId: カスタムテーブル ID
+    ///   - files: アップロードするファイルの配列（カスタムフィールドの画像など）
     /// - Returns: 編集したカスタムエントリー
-    func editCustomEntry(id: Int, _ request: CustomEntryEditRequest, customTableId: Int) async throws -> CustomEntry {
+    func editCustomEntry(
+        id: Int,
+        _ request: CustomEntryEditRequest,
+        customTableId: Int,
+        files: [(name: String, data: Data, fileName: String, mimeType: String)] = []
+    ) async throws -> CustomEntry {
         let res: CustomEntryEditResponse = try await client.edit(
             route: .customEntries,
             id: id,
             data: request,
+            files: files,
             query: tableQuery(customTableId)
         )
         guard let entry = res.entry else {
