@@ -15,5 +15,7 @@ struct Route: Equatable {
     static let customLinks = Route(plugin: "bc-custom-content", controller: "custom_links")
 
     /// API のベースパス（/baser/api/admin/{plugin}/{controller}）
-    var basePath: String { "baser/api/admin/\(plugin)/\(controller)" }
+    var basePath: String {
+        "baser/api/admin/\(plugin)/\(controller)"
+    }
 }

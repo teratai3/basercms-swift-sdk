@@ -1,6 +1,5 @@
 /// ログインレスポンス
 struct LoginResponse: Decodable {
-
     /// アクセストークン
     let accessToken: String
 

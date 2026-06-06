@@ -1,6 +1,5 @@
 /// ユーザーモデル
 struct User: Codable {
-
     /// ユーザーID
     let id: Int
 
@@ -41,7 +40,6 @@ struct User: Codable {
 
 /// ユーザーグループモデル
 struct UserGroup: Codable {
-
     /// ユーザーID
     let id: Int
 
@@ -81,7 +79,6 @@ struct UserGroup: Codable {
 
 /// ユーザーグループデータ
 struct UserGroupJoinData: Codable {
-
     /// ユーザーグループID
     let id: Int
 

@@ -2,272 +2,271 @@ import Foundation
 
 /// baserCMS API クライアント
 final class ApiClient {
+    /// 基底 URL
+    private let baseURL: URL
 
-  /// 基底 URL
-  private let baseURL: URL
+    /// アクセストークン
+    private var accessToken: String?
 
-  /// アクセストークン
-  private var accessToken: String?
+    /// リフレッシュトークン
+    private var refreshToken: String?
 
-  /// リフレッシュトークン
-  private var refreshToken: String?
-
-  /// コンストラクタ
-  init(baseURL: URL) {
-    self.baseURL = baseURL
-  }
-
-  /// ログイン（POST .../users/login.json）
-  func login(email: String, password: String) async throws {
-    let httpBody = try JSONEncoder().encode(["email": email, "password": password])
-    let json: LoginResponse = try await send(
-      path: "baser/api/admin/baser-core/users/login.json",
-      method: "POST",
-      httpBody: httpBody,
-      requiresAuth: false
-    )
-    accessToken = json.accessToken
-    refreshToken = json.refreshToken
-  }
-
-  /// アクセストークンをリフレッシュする（GET .../users/refresh_token.json）
-  func refreshAccessToken() async throws {
-    guard let token = refreshToken else {
-      throw BcError.authenticationFailed
-    }
-    let json: LoginResponse = try await send(
-      path: "baser/api/admin/baser-core/users/refresh_token.json",
-      method: "GET",
-      requiresAuth: false,
-      query: ["token": token]
-    )
-    accessToken = json.accessToken
-    refreshToken = json.refreshToken
-  }
-
-  /// ログアウト（トークンをクリアする）
-  func logout() {
-    accessToken = nil
-    refreshToken = nil
-  }
-
-  /// 一覧を取得する（GET .../index.json）
-  /// - Parameter route: リソースのルート
-  /// - Returns: デコードしたレスポンス
-  func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
-    try await send(path: "\(route.basePath)/index.json", method: "GET", query: query)
-  }
-
-  /// 単一リソースを取得する（GET .../view/{id}.json）
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - id: リソースの ID
-  /// - Returns: デコードしたレスポンス
-  func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
-    try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
-  }
-
-  /// リソースを追加する（POST .../add.json）
-  /// files が空なら application/json、あれば multipart/form-data で送信する
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - data: リソースのデータ
-  ///   - files: アップロードするファイルの配列（省略時は空）
-  ///   - query: クエリパラメーター
-  /// - Returns: デコードしたレスポンス
-  func add<T: Encodable, R: Decodable>(
-    route: Route,
-    data: T,
-    files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
-    query: [String: String] = [:]
-  ) async throws -> R {
-    if files.isEmpty {
-      let httpBody = try JSONEncoder().encode(data)
-      return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
-    } else {
-      let (boundary, body) = try buildMultipartRequest(data: data, files: files)
-      return try await send(
-        path: "\(route.basePath)/add.json",
-        method: "POST",
-        httpBody: body,
-        contentType: "multipart/form-data; boundary=\(boundary)",
-        query: query
-      )
-    }
-  }
-
-  /// リソースを編集する（POST .../edit/{id}.json）
-  /// files が空なら application/json、あれば multipart/form-data で送信する
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - id: リソースの ID
-  ///   - data: 編集するリソースのデータ
-  ///   - files: アップロードするファイルの配列（省略時は空）
-  ///   - query: クエリパラメーター
-  /// - Returns: デコードしたレスポンス
-  func edit<T: Encodable, R: Decodable>(
-    route: Route,
-    id: Int,
-    data: T,
-    files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
-    query: [String: String] = [:]
-  ) async throws -> R {
-    if files.isEmpty {
-      let httpBody = try JSONEncoder().encode(data)
-      return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
-    } else {
-      let (boundary, body) = try buildMultipartRequest(data: data, files: files)
-      return try await send(
-        path: "\(route.basePath)/edit/\(id).json",
-        method: "POST",
-        httpBody: body,
-        contentType: "multipart/form-data; boundary=\(boundary)",
-        query: query
-      )
-    }
-  }
-
-  /// リソースを削除する（POST .../delete/{id}.json）
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - id: リソースの ID
-  ///   - query: クエリパラメーター
-  func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
-    struct Empty: Decodable {}
-    let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
-  }
-
-  /// リソースを削除し、レスポンスを返す（POST .../delete/{id}.json）
-  /// - Parameters:
-  ///   - route: リソースのルート
-  ///   - id: リソースの ID
-  ///   - query: クエリパラメーター
-  /// - Returns: デコードしたレスポンス
-  func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
-    try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
-  }
-
-  /// Encodable なリクエストを multipart/form-data ボディに変換する
-  private func buildMultipartRequest<T: Encodable>(
-    data: T,
-    files: [(name: String, data: Data, fileName: String, mimeType: String)]
-  ) throws -> (boundary: String, body: Data) {
-    let jsonData = try JSONEncoder().encode(data)
-    let jsonObject = (try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]) ?? [:]
-
-    let fields: [(name: String, value: String?)] = jsonObject.compactMap { key, value in
-      switch value {
-      case let s as String:   return (key, s)
-      case let n as NSNumber: return (key, n.stringValue)
-      default:                return nil
-      }
+    /// コンストラクタ
+    init(baseURL: URL) {
+        self.baseURL = baseURL
     }
 
-    let boundary = "Boundary-\(UUID().uuidString)"
-    let body = buildMultipartBody(boundary: boundary, fields: fields, files: files)
-    return (boundary, body)
-  }
-
-  /// multipart/form-data ボディを RFC 2046 形式で組み立てる
-  private func buildMultipartBody(
-    boundary: String,
-    fields: [(name: String, value: String?)],
-    files: [(name: String, data: Data, fileName: String, mimeType: String)]
-  ) -> Data {
-    var body = Data()
-
-    for field in fields {
-      guard let value = field.value else { continue }
-      body.append(Data("--\(boundary)\r\n".utf8))
-      body.append(Data("Content-Disposition: form-data; name=\"\(field.name)\"\r\n".utf8))
-      body.append(Data("\r\n".utf8))
-      body.append(Data(value.utf8))
-      body.append(Data("\r\n".utf8))
+    /// ログイン（POST .../users/login.json）
+    func login(email: String, password: String) async throws {
+        let httpBody = try JSONEncoder().encode(["email": email, "password": password])
+        let json: LoginResponse = try await send(
+            path: "baser/api/admin/baser-core/users/login.json",
+            method: "POST",
+            httpBody: httpBody,
+            requiresAuth: false
+        )
+        accessToken = json.accessToken
+        refreshToken = json.refreshToken
     }
 
-    for file in files {
-      body.append(Data("--\(boundary)\r\n".utf8))
-      body.append(Data("Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(file.fileName)\"\r\n".utf8))
-      body.append(Data("Content-Type: \(file.mimeType)\r\n".utf8))
-      body.append(Data("\r\n".utf8))
-      body.append(file.data)
-      body.append(Data("\r\n".utf8))
+    /// アクセストークンをリフレッシュする（GET .../users/refresh_token.json）
+    func refreshAccessToken() async throws {
+        guard let token = refreshToken else {
+            throw BcError.authenticationFailed
+        }
+        let json: LoginResponse = try await send(
+            path: "baser/api/admin/baser-core/users/refresh_token.json",
+            method: "GET",
+            requiresAuth: false,
+            query: ["token": token]
+        )
+        accessToken = json.accessToken
+        refreshToken = json.refreshToken
     }
 
-    body.append(Data("--\(boundary)--\r\n".utf8))
-    return body
-  }
-
-  /// HTTP リクエストを送信し、JSON をデコードして返す
-  /// - Parameters:
-  ///   - path: ベース URL からの相対パス
-  ///   - method: HTTP メソッド
-  ///   - httpBody: リクエストボディ（任意）
-  ///   - contentType: Content-Type ヘッダー（デフォルト: application/json）
-  ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
-  ///   - query: クエリパラメーター
-  /// - Returns: デコードしたレスポンス
-  private func send<T: Decodable>(
-    path: String,
-    method: String,
-    httpBody: Data? = nil,
-    contentType: String = "application/json",
-    requiresAuth: Bool = true,
-    query: [String: String] = [:]
-  ) async throws -> T {
-    let basePathURL = baseURL.appendingPathComponent(path)
-    var components = URLComponents(url: basePathURL, resolvingAgainstBaseURL: false)!
-
-    if !query.isEmpty {
-      components.queryItems = query.map {
-        URLQueryItem(name: $0.key, value: $0.value)
-      }
+    /// ログアウト（トークンをクリアする）
+    func logout() {
+        accessToken = nil
+        refreshToken = nil
     }
 
-    // クエリーパラメーターでurlが失敗する可能性があるので、guardでチェック
-    guard let url = components.url else {
-      throw BcError.invalidURL
+    /// 一覧を取得する（GET .../index.json）
+    /// - Parameter route: リソースのルート
+    /// - Returns: デコードしたレスポンス
+    func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
+        try await send(path: "\(route.basePath)/index.json", method: "GET", query: query)
     }
 
-    // リクエストを作成
-    var request = URLRequest(url: url)
-    request.httpMethod = method
-    request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-    request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
-
-    // 認証トークンを付与
-    if requiresAuth {
-      guard let accessToken = accessToken else {
-        throw BcError.authenticationFailed
-      }
-      request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+    /// 単一リソースを取得する（GET .../view/{id}.json）
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - id: リソースの ID
+    /// - Returns: デコードしたレスポンス
+    func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
+        try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
     }
 
-    // ボディを付与
-    if let httpBody = httpBody {
-      request.httpBody = httpBody
+    /// リソースを追加する（POST .../add.json）
+    /// files が空なら application/json、あれば multipart/form-data で送信する
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - data: リソースのデータ
+    ///   - files: アップロードするファイルの配列（省略時は空）
+    ///   - query: クエリパラメーター
+    /// - Returns: デコードしたレスポンス
+    func add<T: Encodable, R: Decodable>(
+        route: Route,
+        data: T,
+        files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
+        query: [String: String] = [:]
+    ) async throws -> R {
+        if files.isEmpty {
+            let httpBody = try JSONEncoder().encode(data)
+            return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
+        } else {
+            let (boundary, body) = try buildMultipartRequest(data: data, files: files)
+            return try await send(
+                path: "\(route.basePath)/add.json",
+                method: "POST",
+                httpBody: body,
+                contentType: "multipart/form-data; boundary=\(boundary)",
+                query: query
+            )
+        }
     }
 
-    // リクエストを送信
-    let (data, response) = try await URLSession.shared.data(for: request)
-
-    // レスポンスを検証
-    let validData = try validate(data: data, response: response)
-
-    return try JSONDecoder().decode(T.self, from: validData)
-  }
-
-  /// HTTP レスポンスを検証し、問題なければボディを返す
-  private func validate(data: Data, response: URLResponse) throws -> Data {
-    guard let httpResponse = response as? HTTPURLResponse else {
-      throw BcError.invalidResponse
+    /// リソースを編集する（POST .../edit/{id}.json）
+    /// files が空なら application/json、あれば multipart/form-data で送信する
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - id: リソースの ID
+    ///   - data: 編集するリソースのデータ
+    ///   - files: アップロードするファイルの配列（省略時は空）
+    ///   - query: クエリパラメーター
+    /// - Returns: デコードしたレスポンス
+    func edit<T: Encodable, R: Decodable>(
+        route: Route,
+        id: Int,
+        data: T,
+        files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
+        query: [String: String] = [:]
+    ) async throws -> R {
+        if files.isEmpty {
+            let httpBody = try JSONEncoder().encode(data)
+            return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
+        } else {
+            let (boundary, body) = try buildMultipartRequest(data: data, files: files)
+            return try await send(
+                path: "\(route.basePath)/edit/\(id).json",
+                method: "POST",
+                httpBody: body,
+                contentType: "multipart/form-data; boundary=\(boundary)",
+                query: query
+            )
+        }
     }
 
-    guard httpResponse.statusCode == 200 else {
-      let errorMessage = try? JSONDecoder().decode(ErrorResponse.self, from: data).message
-      throw BcError.httpError(statusCode: httpResponse.statusCode, message: errorMessage)
+    /// リソースを削除する（POST .../delete/{id}.json）
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - id: リソースの ID
+    ///   - query: クエリパラメーター
+    func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
+        struct Empty: Decodable {}
+        let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
     }
 
-    return data
-  }
+    /// リソースを削除し、レスポンスを返す（POST .../delete/{id}.json）
+    /// - Parameters:
+    ///   - route: リソースのルート
+    ///   - id: リソースの ID
+    ///   - query: クエリパラメーター
+    /// - Returns: デコードしたレスポンス
+    func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
+        try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
+    }
+
+    /// Encodable なリクエストを multipart/form-data ボディに変換する
+    private func buildMultipartRequest<T: Encodable>(
+        data: T,
+        files: [(name: String, data: Data, fileName: String, mimeType: String)]
+    ) throws -> (boundary: String, body: Data) {
+        let jsonData = try JSONEncoder().encode(data)
+        let jsonObject = (try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]) ?? [:]
+
+        let fields: [(name: String, value: String?)] = jsonObject.compactMap { key, value in
+            switch value {
+            case let s as String: return (key, s)
+            case let n as NSNumber: return (key, n.stringValue)
+            default: return nil
+            }
+        }
+
+        let boundary = "Boundary-\(UUID().uuidString)"
+        let body = buildMultipartBody(boundary: boundary, fields: fields, files: files)
+        return (boundary, body)
+    }
+
+    /// multipart/form-data ボディを RFC 2046 形式で組み立てる
+    private func buildMultipartBody(
+        boundary: String,
+        fields: [(name: String, value: String?)],
+        files: [(name: String, data: Data, fileName: String, mimeType: String)]
+    ) -> Data {
+        var body = Data()
+
+        for field in fields {
+            guard let value = field.value else { continue }
+            body.append(Data("--\(boundary)\r\n".utf8))
+            body.append(Data("Content-Disposition: form-data; name=\"\(field.name)\"\r\n".utf8))
+            body.append(Data("\r\n".utf8))
+            body.append(Data(value.utf8))
+            body.append(Data("\r\n".utf8))
+        }
+
+        for file in files {
+            body.append(Data("--\(boundary)\r\n".utf8))
+            body.append(Data("Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(file.fileName)\"\r\n".utf8))
+            body.append(Data("Content-Type: \(file.mimeType)\r\n".utf8))
+            body.append(Data("\r\n".utf8))
+            body.append(file.data)
+            body.append(Data("\r\n".utf8))
+        }
+
+        body.append(Data("--\(boundary)--\r\n".utf8))
+        return body
+    }
+
+    /// HTTP リクエストを送信し、JSON をデコードして返す
+    /// - Parameters:
+    ///   - path: ベース URL からの相対パス
+    ///   - method: HTTP メソッド
+    ///   - httpBody: リクエストボディ（任意）
+    ///   - contentType: Content-Type ヘッダー（デフォルト: application/json）
+    ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
+    ///   - query: クエリパラメーター
+    /// - Returns: デコードしたレスポンス
+    private func send<T: Decodable>(
+        path: String,
+        method: String,
+        httpBody: Data? = nil,
+        contentType: String = "application/json",
+        requiresAuth: Bool = true,
+        query: [String: String] = [:]
+    ) async throws -> T {
+        let basePathURL = baseURL.appendingPathComponent(path)
+        var components = URLComponents(url: basePathURL, resolvingAgainstBaseURL: false)!
+
+        if !query.isEmpty {
+            components.queryItems = query.map {
+                URLQueryItem(name: $0.key, value: $0.value)
+            }
+        }
+
+        // クエリーパラメーターでurlが失敗する可能性があるので、guardでチェック
+        guard let url = components.url else {
+            throw BcError.invalidURL
+        }
+
+        // リクエストを作成
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
+
+        // 認証トークンを付与
+        if requiresAuth {
+            guard let accessToken = accessToken else {
+                throw BcError.authenticationFailed
+            }
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
+        // ボディを付与
+        if let httpBody = httpBody {
+            request.httpBody = httpBody
+        }
+
+        // リクエストを送信
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        // レスポンスを検証
+        let validData = try validate(data: data, response: response)
+
+        return try JSONDecoder().decode(T.self, from: validData)
+    }
+
+    /// HTTP レスポンスを検証し、問題なければボディを返す
+    private func validate(data: Data, response: URLResponse) throws -> Data {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw BcError.invalidResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = try? JSONDecoder().decode(ErrorResponse.self, from: data).message
+            throw BcError.httpError(statusCode: httpResponse.statusCode, message: errorMessage)
+        }
+
+        return data
+    }
 }
