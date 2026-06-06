@@ -6,24 +6,16 @@ final class ApiClient {
   /// 基底 URL
   private let baseURL: URL
 
-  /// ログイン用メールアドレス
-  private let email: String
-
-  /// ログイン用パスワード
-  private let password: String
-
   /// アクセストークン
   private var accessToken: String?
 
   /// コンストラクタ
-  init(baseURL: URL, email: String, password: String) {
+  init(baseURL: URL) {
     self.baseURL = baseURL
-    self.email = email
-    self.password = password
   }
 
   /// ログイン（POST .../users/login.json）
-  func login() async throws {
+  func login(email: String, password: String) async throws {
     let httpBody = try JSONEncoder().encode(["email": email, "password": password])
     let json: LoginResponse = try await send(
       path: "baser/api/admin/baser-core/users/login.json",
