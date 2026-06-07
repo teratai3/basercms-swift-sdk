@@ -53,7 +53,7 @@ open class ApiClient {
     /// 一覧を取得する（GET .../index.json）
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
-    public func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
+    func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
         try await send(path: "\(route.basePath)/index.json", method: "GET", query: query)
     }
 
@@ -62,7 +62,7 @@ open class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     /// - Returns: デコードしたレスポンス
-    public func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
+    func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
         try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
     }
 
@@ -74,7 +74,7 @@ open class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    public func add<T: Encodable, R: Decodable>(
+    func add<T: Encodable, R: Decodable>(
         route: Route,
         data: T,
         files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
@@ -104,7 +104,7 @@ open class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    public func edit<T: Encodable, R: Decodable>(
+    func edit<T: Encodable, R: Decodable>(
         route: Route,
         id: Int,
         data: T,
@@ -131,7 +131,7 @@ open class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
-    public func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
+    func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
         struct Empty: Decodable {}
         let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
     }
@@ -142,7 +142,7 @@ open class ApiClient {
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    public func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
+    func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
         try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
     }
 
