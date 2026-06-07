@@ -1,7 +1,7 @@
 import Foundation
 
 /// baserCMS API クライアント
-public final class ApiClient {
+open class ApiClient {
     /// 基底 URL
     private let baseURL: URL
 
@@ -198,6 +198,10 @@ public final class ApiClient {
     }
 
     /// HTTP リクエストを送信し、JSON をデコードして返す
+    ///
+    /// `@_spi(BaserCMSExtension)` 指定により、通常の `import BaserCMS` からは見えない。
+    /// 本クラスを継承してアプリ固有 API を実装する場合のみ
+    /// `@_spi(BaserCMSExtension) import BaserCMS` で利用できる（protected 相当の限定公開）。
     /// - Parameters:
     ///   - path: ベース URL からの相対パス
     ///   - method: HTTP メソッド
@@ -205,14 +209,17 @@ public final class ApiClient {
     ///   - contentType: Content-Type ヘッダー（デフォルト: application/json）
     ///   - requiresAuth: 認証トークンを付与するか（デフォルト: true）
     ///   - query: クエリパラメーター
+    ///   - headers: 追加で付与するヘッダー（device_id など）
     /// - Returns: デコードしたレスポンス
-    private func send<T: Decodable>(
+    @_spi(BaserCMSExtension)
+    public func send<T: Decodable>(
         path: String,
         method: String,
         httpBody: Data? = nil,
         contentType: String = "application/json",
         requiresAuth: Bool = true,
-        query: [String: String] = [:]
+        query: [String: String] = [:],
+        headers: [String: String] = [:]
     ) async throws -> T {
         let basePathURL = baseURL.appendingPathComponent(path)
         var components = URLComponents(url: basePathURL, resolvingAgainstBaseURL: false)!
@@ -240,6 +247,11 @@ public final class ApiClient {
                 throw BcError.authenticationFailed
             }
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
+        // 追加ヘッダーを付与（device_id など）
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
         }
 
         // ボディを付与
