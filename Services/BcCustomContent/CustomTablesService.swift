@@ -2,7 +2,7 @@ import Foundation
 
 /// カスタムテーブル関連の API を扱うサービス
 public struct CustomTablesService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

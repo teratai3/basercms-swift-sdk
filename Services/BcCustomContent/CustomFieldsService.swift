@@ -2,7 +2,7 @@ import Foundation
 
 /// カスタムフィールド関連の API を扱うサービス
 public struct CustomFieldsService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

@@ -2,7 +2,7 @@ import Foundation
 
 /// ブログ記事関連の API を扱うサービス
 public struct BlogPostsService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

@@ -2,7 +2,7 @@ import Foundation
 
 /// カスタムコンテンツ関連の API を扱うサービス
 public struct CustomContentsService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

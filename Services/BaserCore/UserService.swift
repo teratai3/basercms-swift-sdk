@@ -1,6 +1,6 @@
 /// ユーザー関連の API を扱うサービス
 public struct UserService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

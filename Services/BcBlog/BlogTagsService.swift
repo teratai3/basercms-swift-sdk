@@ -2,7 +2,7 @@ import Foundation
 
 /// ブログタグ関連の API を扱うサービス
 public struct BlogTagsService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

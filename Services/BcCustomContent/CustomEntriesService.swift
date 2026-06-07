@@ -3,7 +3,7 @@ import Foundation
 /// カスタムエントリー関連の API を扱うサービス
 /// 全操作で custom_table_id クエリパラメーターが必須
 public struct CustomEntriesService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {

@@ -3,7 +3,7 @@ import Foundation
 /// カスタムリンク関連の API を扱うサービス
 /// 一覧取得には custom_table_id クエリパラメーターが必須
 public struct CustomLinksService {
-    public let client: ApiClient
+    private let client: ApiClient
 
     /// コンストラクタ
     public init(client: ApiClient) {
