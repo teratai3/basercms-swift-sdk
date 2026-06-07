@@ -2,15 +2,15 @@ import Foundation
 
 /// GET .../custom_entries/index.json のレスポンス
 /// レスポンスキーは `entries`（`customEntries` ではない）
-public struct CustomEntriesIndexResponse: Decodable {
-    public let entries: [CustomEntry]?
-    public let message: String?
+struct CustomEntriesIndexResponse: Decodable {
+    let entries: [CustomEntry]?
+    let message: String?
 }
 
 /// GET .../custom_entries/view/{id}.json のレスポンス
-public struct CustomEntryViewResponse: Decodable {
-    public let entry: CustomEntry?
-    public let message: String?
+struct CustomEntryViewResponse: Decodable {
+    let entry: CustomEntry?
+    let message: String?
 }
 
 /// POST .../custom_entries/add.json のリクエスト
@@ -55,9 +55,9 @@ public struct CustomEntryAddRequest: Encodable {
 }
 
 /// POST .../custom_entries/add.json のレスポンス
-public struct CustomEntryAddResponse: Decodable {
-    public let entry: CustomEntry?
-    public let message: String?
+struct CustomEntryAddResponse: Decodable {
+    let entry: CustomEntry?
+    let message: String?
 }
 
 /// POST .../custom_entries/edit/{id}.json のリクエスト
@@ -98,7 +98,7 @@ public struct CustomEntryEditRequest: Encodable {
 }
 
 /// POST .../custom_entries/edit/{id}.json のレスポンス
-public struct CustomEntryEditResponse: Decodable {
-    public let entry: CustomEntry?
-    public let message: String?
+struct CustomEntryEditResponse: Decodable {
+    let entry: CustomEntry?
+    let message: String?
 }

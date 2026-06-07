@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../blog_categories/index.json のレスポンス
-public struct BlogCategoriesIndexResponse: Decodable {
-    public let blogCategories: [BlogCategory]?
-    public let message: String?
+struct BlogCategoriesIndexResponse: Decodable {
+    let blogCategories: [BlogCategory]?
+    let message: String?
 }
 
 /// GET .../blog_categories/view/{id}.json のレスポンス
-public struct BlogCategoryViewResponse: Decodable {
-    public let blogCategory: BlogCategory?
-    public let message: String?
+struct BlogCategoryViewResponse: Decodable {
+    let blogCategory: BlogCategory?
+    let message: String?
 }
 
 /// POST .../blog_categories/add.json のリクエスト
@@ -40,9 +40,9 @@ public struct BlogCategoryAddRequest: Encodable {
 }
 
 /// POST .../blog_categories/add.json のレスポンス
-public struct BlogCategoryAddResponse: Decodable {
-    public let blogCategory: BlogCategory?
-    public let message: String?
+struct BlogCategoryAddResponse: Decodable {
+    let blogCategory: BlogCategory?
+    let message: String?
 }
 
 /// POST .../blog_categories/edit/{id}.json のリクエスト
@@ -72,7 +72,7 @@ public struct BlogCategoryEditRequest: Encodable {
 }
 
 /// POST .../blog_categories/edit/{id}.json のレスポンス
-public struct BlogCategoryEditResponse: Decodable {
-    public let blogCategory: BlogCategory?
-    public let message: String?
+struct BlogCategoryEditResponse: Decodable {
+    let blogCategory: BlogCategory?
+    let message: String?
 }

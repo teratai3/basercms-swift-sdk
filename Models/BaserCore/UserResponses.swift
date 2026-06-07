@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET /baser/api/admin/baser-core/users/index.json のレスポンス
-public struct UsersIndexResponse: Decodable {
-    public let users: [User]?
-    public let message: String?
+struct UsersIndexResponse: Decodable {
+    let users: [User]?
+    let message: String?
 }
 
 /// GET /baser/api/admin/baser-core/users/view/{id}.json のレスポンス
-public struct UserViewResponse: Decodable {
-    public let user: User?
-    public let message: String?
+struct UserViewResponse: Decodable {
+    let user: User?
+    let message: String?
 }
 
 /// POST /baser/api/admin/baser-core/users/add.json のリクエスト
@@ -120,8 +120,8 @@ public struct UserEditRequest: Encodable {
 }
 
 /// POST .../users/add.json および edit/{id}.json のレスポンス（形は同じ）
-public struct UserSaveResponse: Decodable {
-    public let user: User?
-    public let message: String?
-    public let error: String?
+struct UserSaveResponse: Decodable {
+    let user: User?
+    let message: String?
+    let error: String?
 }

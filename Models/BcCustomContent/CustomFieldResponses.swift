@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../custom_fields/index.json のレスポンス
-public struct CustomFieldsIndexResponse: Decodable {
-    public let customFields: [CustomField]?
-    public let message: String?
+struct CustomFieldsIndexResponse: Decodable {
+    let customFields: [CustomField]?
+    let message: String?
 }
 
 /// GET .../custom_fields/view/{id}.json のレスポンス
-public struct CustomFieldViewResponse: Decodable {
-    public let customField: CustomField?
-    public let message: String?
+struct CustomFieldViewResponse: Decodable {
+    let customField: CustomField?
+    let message: String?
 }
 
 /// POST .../custom_fields/add.json のリクエスト
@@ -38,9 +38,9 @@ public struct CustomFieldAddRequest: Encodable {
 }
 
 /// POST .../custom_fields/add.json のレスポンス
-public struct CustomFieldAddResponse: Decodable {
-    public let customField: CustomField?
-    public let message: String?
+struct CustomFieldAddResponse: Decodable {
+    let customField: CustomField?
+    let message: String?
 }
 
 /// POST .../custom_fields/edit/{id}.json のリクエスト
@@ -69,7 +69,7 @@ public struct CustomFieldEditRequest: Encodable {
 }
 
 /// POST .../custom_fields/edit/{id}.json のレスポンス
-public struct CustomFieldEditResponse: Decodable {
-    public let customField: CustomField?
-    public let message: String?
+struct CustomFieldEditResponse: Decodable {
+    let customField: CustomField?
+    let message: String?
 }

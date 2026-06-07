@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../blog_posts/index.json のレスポンス
-public struct BlogPostsIndexResponse: Decodable {
-    public let blogPosts: [BlogPost]?
-    public let message: String?
+struct BlogPostsIndexResponse: Decodable {
+    let blogPosts: [BlogPost]?
+    let message: String?
 }
 
 /// GET .../blog_posts/view/{id}.json のレスポンス
-public struct BlogPostViewResponse: Decodable {
-    public let blogPost: BlogPost?
-    public let message: String?
+struct BlogPostViewResponse: Decodable {
+    let blogPost: BlogPost?
+    let message: String?
 }
 
 /// POST .../blog_posts/add.json のリクエスト
@@ -83,9 +83,9 @@ public struct BlogPostEyeCatch {
 }
 
 /// POST .../blog_posts/add.json のレスポンス
-public struct BlogPostAddResponse: Decodable {
-    public let blogPost: BlogPost?
-    public let message: String?
+struct BlogPostAddResponse: Decodable {
+    let blogPost: BlogPost?
+    let message: String?
 }
 
 /// POST .../blog_posts/edit/{id}.json のリクエスト
@@ -141,7 +141,7 @@ public struct BlogPostEditRequest: Encodable {
 }
 
 /// POST .../blog_posts/edit/{id}.json のレスポンス
-public struct BlogPostEditResponse: Decodable {
-    public let blogPost: BlogPost?
-    public let message: String?
+struct BlogPostEditResponse: Decodable {
+    let blogPost: BlogPost?
+    let message: String?
 }

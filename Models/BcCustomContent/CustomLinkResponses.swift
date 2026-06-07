@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../custom_links/index.json のレスポンス
-public struct CustomLinksIndexResponse: Decodable {
-    public let customLinks: [CustomLink]?
-    public let message: String?
+struct CustomLinksIndexResponse: Decodable {
+    let customLinks: [CustomLink]?
+    let message: String?
 }
 
 /// GET .../custom_links/view/{id}.json のレスポンス
-public struct CustomLinkViewResponse: Decodable {
-    public let customLink: CustomLink?
-    public let message: String?
+struct CustomLinkViewResponse: Decodable {
+    let customLink: CustomLink?
+    let message: String?
 }
 
 /// POST .../custom_links/add.json のリクエスト
@@ -113,9 +113,9 @@ public struct CustomLinkAddRequest: Encodable {
 }
 
 /// POST .../custom_links/add.json のレスポンス
-public struct CustomLinkAddResponse: Decodable {
-    public let customLink: CustomLink?
-    public let message: String?
+struct CustomLinkAddResponse: Decodable {
+    let customLink: CustomLink?
+    let message: String?
 }
 
 /// POST .../custom_links/edit/{id}.json のリクエスト
@@ -201,7 +201,7 @@ public struct CustomLinkEditRequest: Encodable {
 }
 
 /// POST .../custom_links/edit/{id}.json のレスポンス
-public struct CustomLinkEditResponse: Decodable {
-    public let customLink: CustomLink?
-    public let message: String?
+struct CustomLinkEditResponse: Decodable {
+    let customLink: CustomLink?
+    let message: String?
 }

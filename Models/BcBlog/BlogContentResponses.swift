@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../blog_contents/index.json のレスポンス
-public struct BlogContentsIndexResponse: Decodable {
-    public let blogContents: [BlogContent]?
-    public let message: String?
+struct BlogContentsIndexResponse: Decodable {
+    let blogContents: [BlogContent]?
+    let message: String?
 }
 
 /// GET .../blog_contents/view/{id}.json のレスポンス
-public struct BlogContentViewResponse: Decodable {
-    public let blogContent: BlogContent?
-    public let message: String?
+struct BlogContentViewResponse: Decodable {
+    let blogContent: BlogContent?
+    let message: String?
 }
 
 /// POST .../blog_contents/add.json の content ネストオブジェクト
@@ -99,9 +99,9 @@ public struct BlogContentAddRequest: Encodable {
 }
 
 /// POST .../blog_contents/add.json のレスポンス
-public struct BlogContentAddResponse: Decodable {
-    public let blogContent: BlogContent?
-    public let message: String?
+struct BlogContentAddResponse: Decodable {
+    let blogContent: BlogContent?
+    let message: String?
 }
 
 /// POST .../blog_contents/edit/{id}.json のリクエスト
@@ -160,7 +160,7 @@ public struct BlogContentEditRequest: Encodable {
 }
 
 /// POST .../blog_contents/edit/{id}.json のレスポンス
-public struct BlogContentEditResponse: Decodable {
-    public let blogContent: BlogContent?
-    public let message: String?
+struct BlogContentEditResponse: Decodable {
+    let blogContent: BlogContent?
+    let message: String?
 }

@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../custom_tables/index.json のレスポンス
-public struct CustomTablesIndexResponse: Decodable {
-    public let customTables: [CustomTable]?
-    public let message: String?
+struct CustomTablesIndexResponse: Decodable {
+    let customTables: [CustomTable]?
+    let message: String?
 }
 
 /// GET .../custom_tables/view/{id}.json のレスポンス
-public struct CustomTableViewResponse: Decodable {
-    public let customTable: CustomTable?
-    public let message: String?
+struct CustomTableViewResponse: Decodable {
+    let customTable: CustomTable?
+    let message: String?
 }
 
 /// POST .../custom_tables/add.json のリクエスト
@@ -43,9 +43,9 @@ public struct CustomTableAddRequest: Encodable {
 }
 
 /// POST .../custom_tables/add.json のレスポンス
-public struct CustomTableAddResponse: Decodable {
-    public let customTable: CustomTable?
-    public let message: String?
+struct CustomTableAddResponse: Decodable {
+    let customTable: CustomTable?
+    let message: String?
 }
 
 /// POST .../custom_tables/edit/{id}.json のリクエスト
@@ -79,7 +79,7 @@ public struct CustomTableEditRequest: Encodable {
 }
 
 /// POST .../custom_tables/edit/{id}.json のレスポンス
-public struct CustomTableEditResponse: Decodable {
-    public let customTable: CustomTable?
-    public let message: String?
+struct CustomTableEditResponse: Decodable {
+    let customTable: CustomTable?
+    let message: String?
 }

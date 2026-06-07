@@ -1,15 +1,15 @@
 import Foundation
 
 /// GET .../custom_contents/index.json のレスポンス
-public struct CustomContentsIndexResponse: Decodable {
-    public let customContents: [CustomContent]?
-    public let message: String?
+struct CustomContentsIndexResponse: Decodable {
+    let customContents: [CustomContent]?
+    let message: String?
 }
 
 /// GET .../custom_contents/view/{id}.json のレスポンス
-public struct CustomContentViewResponse: Decodable {
-    public let customContent: CustomContent?
-    public let message: String?
+struct CustomContentViewResponse: Decodable {
+    let customContent: CustomContent?
+    let message: String?
 }
 
 /// POST .../custom_contents/add.json の content ネストオブジェクト
@@ -87,9 +87,9 @@ public struct CustomContentAddRequest: Encodable {
 }
 
 /// POST .../custom_contents/add.json のレスポンス
-public struct CustomContentAddResponse: Decodable {
-    public let customContent: CustomContent?
-    public let message: String?
+struct CustomContentAddResponse: Decodable {
+    let customContent: CustomContent?
+    let message: String?
 }
 
 /// POST .../custom_contents/edit/{id}.json の content ネストオブジェクト
@@ -147,7 +147,7 @@ public struct CustomContentEditRequest: Encodable {
 }
 
 /// POST .../custom_contents/edit/{id}.json のレスポンス
-public struct CustomContentEditResponse: Decodable {
-    public let customContent: CustomContent?
-    public let message: String?
+struct CustomContentEditResponse: Decodable {
+    let customContent: CustomContent?
+    let message: String?
 }
