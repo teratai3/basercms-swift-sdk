@@ -1,27 +1,27 @@
 /// ブログ記事モデル
-struct BlogPost: Codable {
-    let id: Int
-    let blogContentId: Int
-    let no: Int
-    let name: String?
-    let title: String
-    let content: String?
-    let detail: String?
-    let blogCategoryId: Int?
-    let userId: Int
-    let status: Bool
-    let posted: String?
-    let contentDraft: String?
-    let detailDraft: String?
-    let publishBegin: String?
-    let publishEnd: String?
-    let excludeSearch: Bool?
-    let eyeCatch: String?
-    let created: String?
-    let modified: String?
-    let blogTags: [BlogTag]?
-    let blogCategory: BlogCategory?
-    let blogContent: BlogContent?
+public struct BlogPost: Codable {
+    public let id: Int
+    public let blogContentId: Int
+    public let no: Int
+    public let name: String?
+    public let title: String
+    public let content: String?
+    public let detail: String?
+    public let blogCategoryId: Int?
+    public let userId: Int
+    public let status: Bool
+    public let posted: String?
+    public let contentDraft: String?
+    public let detailDraft: String?
+    public let publishBegin: String?
+    public let publishEnd: String?
+    public let excludeSearch: Bool?
+    public let eyeCatch: String?
+    public let created: String?
+    public let modified: String?
+    public let blogTags: [BlogTag]?
+    public let blogCategory: BlogCategory?
+    public let blogContent: BlogContent?
 
     enum CodingKeys: String, CodingKey {
         case id, no, name, title, content, detail, status, posted, created, modified

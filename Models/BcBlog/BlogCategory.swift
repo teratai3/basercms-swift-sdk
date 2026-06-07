@@ -1,16 +1,16 @@
 /// ブログカテゴリモデル
-struct BlogCategory: Codable {
-    let id: Int
-    let blogContentId: Int
-    let no: Int
-    let name: String
-    let title: String?
-    let status: Bool?
-    let parentId: Int?
-    let lft: Int?
-    let rght: Int?
-    let created: String?
-    let modified: String?
+public struct BlogCategory: Codable {
+    public let id: Int
+    public let blogContentId: Int
+    public let no: Int
+    public let name: String
+    public let title: String?
+    public let status: Bool?
+    public let parentId: Int?
+    public let lft: Int?
+    public let rght: Int?
+    public let created: String?
+    public let modified: String?
 
     enum CodingKeys: String, CodingKey {
         case id, no, name, title, status, lft, rght, created, modified

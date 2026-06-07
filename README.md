@@ -95,14 +95,14 @@ let user = try await service.getUserByEmail(email: "user@example.com")
 let user = try await service.addUser(
     UserAddRequest(
         name: "newuser",
+        email: "newuser@example.com",
         password1: "Password123456",
         password2: "Password123456",
         realName1: "山田",
         realName2: "太郎",
-        email: "newuser@example.com",
         nickname: "やまだ",
-        userGroupIds: [1],
-        status: true
+        status: true,
+        userGroups: .init(ids: [1])
     )
 )
 ```
@@ -113,9 +113,10 @@ let user = try await service.addUser(
 let user = try await service.editUser(
     id: 1,
     UserEditRequest(
-        realName1: "田中",
         email: "updated@example.com",
-        status: true
+        realName1: "田中",
+        status: true,
+        userGroups: .init(ids: [1])
     )
 )
 ```
@@ -386,8 +387,21 @@ let entries = try await service.getCustomEntries(customTableId: 1)
 let entry = try await service.getCustomEntry(id: 1, customTableId: 1)
 ```
 
+### カスタムフィールド値の読み取り
+
+固定カラム以外のフィールド値は `customFields` に取り込まれます。
+型別のアクセサーで取り出せます（数値文字列のパースなど緩やかに変換します）。
+
+```swift
+let emotion = entry.string("emotion")      // String?
+let count   = entry.int("empathy_count")   // Int?
+let isOpen  = entry.bool("is_open")        // Bool?
+let raw     = entry["emotion"]             // BcValue?
+```
+
 ### 追加
 
+カスタムフィールドの値は `customFields` で渡します（キーはフィールド名）。
 ファイルフィールドがある場合は `files` パラメーターで渡します。
 
 ```swift
@@ -397,7 +411,12 @@ let entry = try await service.addCustomEntry(
         name: "entry-name",
         title: "エントリータイトル",
         status: true,
-        creatorId: 1
+        creatorId: 1,
+        customFields: [
+            "emotion": "happy",
+            "body": "今日は楽しかった",
+            "empathy_count": 0
+        ]
     ),
     customTableId: 1,
     files: [
@@ -408,14 +427,16 @@ let entry = try await service.addCustomEntry(
 
 ### 編集
 
+省略可能な引数（`name`・`title`・`status`・`customFields`）は指定したもののみ送信されます。
+
 ```swift
 let entry = try await service.editCustomEntry(
     id: 1,
     CustomEntryEditRequest(
         customTableId: 1,
-        name: nil,
         title: "編集後タイトル",
-        status: true
+        status: true,
+        customFields: ["empathy_count": 6]
     ),
     customTableId: 1
 )

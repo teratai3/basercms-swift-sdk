@@ -1,7 +1,7 @@
 import Foundation
 
 /// baserCMS エラー
-enum BcError: LocalizedError {
+public enum BcError: LocalizedError {
     /// 無効な URL です
     case invalidURL
 
@@ -18,7 +18,7 @@ enum BcError: LocalizedError {
     case httpError(statusCode: Int, message: String? = nil)
 
     /// エラーの説明文を返す
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "無効な URL です"

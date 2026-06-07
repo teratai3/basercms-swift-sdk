@@ -1,35 +1,35 @@
 /// カスタムリンクモデル
-struct CustomLink: Codable {
-    let id: Int
-    let customTableId: Int?
-    let customFieldId: Int?
-    let no: Int?
-    let parentId: Int?
-    let level: Int?
-    let lft: Int?
-    let rght: Int?
-    let name: String?
-    let title: String?
-    let beforeHead: String?
-    let afterHead: String?
-    let description: String?
-    let attention: String?
-    let options: String?
-    let cssClass: String?
-    let groupValid: Bool?
-    let beforeLinefeed: Bool?
-    let afterLinefeed: Bool?
-    let useLoop: Bool?
-    let displayAdminList: Bool?
-    let displayFront: Bool?
-    let searchTargetAdmin: Bool?
-    let searchTargetFront: Bool?
-    let useApi: Bool?
-    let required: Bool?
-    let status: Bool?
-    let created: String?
-    let modified: String?
-    let customField: CustomField?
+public struct CustomLink: Codable {
+    public let id: Int
+    public let customTableId: Int?
+    public let customFieldId: Int?
+    public let no: Int?
+    public let parentId: Int?
+    public let level: Int?
+    public let lft: Int?
+    public let rght: Int?
+    public let name: String?
+    public let title: String?
+    public let beforeHead: String?
+    public let afterHead: String?
+    public let description: String?
+    public let attention: String?
+    public let options: String?
+    public let cssClass: String?
+    public let groupValid: Bool?
+    public let beforeLinefeed: Bool?
+    public let afterLinefeed: Bool?
+    public let useLoop: Bool?
+    public let displayAdminList: Bool?
+    public let displayFront: Bool?
+    public let searchTargetAdmin: Bool?
+    public let searchTargetFront: Bool?
+    public let useApi: Bool?
+    public let required: Bool?
+    public let status: Bool?
+    public let created: String?
+    public let modified: String?
+    public let customField: CustomField?
 
     enum CodingKeys: String, CodingKey {
         case id, no, name, title, description, attention, options, required, status, created, modified

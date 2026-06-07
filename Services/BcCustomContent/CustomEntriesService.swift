@@ -2,8 +2,13 @@ import Foundation
 
 /// カスタムエントリー関連の API を扱うサービス
 /// 全操作で custom_table_id クエリパラメーターが必須
-struct CustomEntriesService {
-    let client: ApiClient
+public struct CustomEntriesService {
+    public let client: ApiClient
+
+    /// コンストラクタ
+    public init(client: ApiClient) {
+        self.client = client
+    }
 
     private func tableQuery(_ customTableId: Int) -> [String: String] {
         ["custom_table_id": String(customTableId)]
@@ -12,7 +17,7 @@ struct CustomEntriesService {
     /// カスタムエントリー一覧を取得する
     /// - Parameter customTableId: カスタムテーブル ID
     /// - Returns: カスタムエントリーの配列（該当なしの場合は空配列）
-    func getCustomEntries(customTableId: Int) async throws -> [CustomEntry] {
+    public func getCustomEntries(customTableId: Int) async throws -> [CustomEntry] {
         let res: CustomEntriesIndexResponse = try await client.getIndex(
             route: .customEntries,
             query: tableQuery(customTableId)
@@ -25,7 +30,7 @@ struct CustomEntriesService {
     ///   - id: カスタムエントリー ID
     ///   - customTableId: カスタムテーブル ID
     /// - Returns: 該当するカスタムエントリー
-    func getCustomEntry(id: Int, customTableId: Int) async throws -> CustomEntry {
+    public func getCustomEntry(id: Int, customTableId: Int) async throws -> CustomEntry {
         let res: CustomEntryViewResponse = try await client.getView(
             route: .customEntries,
             id: id,
@@ -43,7 +48,7 @@ struct CustomEntriesService {
     ///   - customTableId: カスタムテーブル ID
     ///   - files: アップロードするファイルの配列（カスタムフィールドの画像など）
     /// - Returns: 追加したカスタムエントリー
-    func addCustomEntry(
+    public func addCustomEntry(
         _ request: CustomEntryAddRequest,
         customTableId: Int,
         files: [(name: String, data: Data, fileName: String, mimeType: String)] = []
@@ -67,7 +72,7 @@ struct CustomEntriesService {
     ///   - customTableId: カスタムテーブル ID
     ///   - files: アップロードするファイルの配列（カスタムフィールドの画像など）
     /// - Returns: 編集したカスタムエントリー
-    func editCustomEntry(
+    public func editCustomEntry(
         id: Int,
         _ request: CustomEntryEditRequest,
         customTableId: Int,
@@ -90,7 +95,7 @@ struct CustomEntriesService {
     /// - Parameters:
     ///   - id: カスタムエントリー ID
     ///   - customTableId: カスタムテーブル ID
-    func deleteCustomEntry(id: Int, customTableId: Int) async throws {
+    public func deleteCustomEntry(id: Int, customTableId: Int) async throws {
         try await client.delete(
             route: .customEntries,
             id: id,

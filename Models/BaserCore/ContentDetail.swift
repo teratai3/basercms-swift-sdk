@@ -1,40 +1,40 @@
 /// baser-core Content エンティティ
 /// BlogContent・CustomContent など複数プラグインから参照される共通モデル
-struct ContentDetail: Codable {
-    let id: Int
-    let name: String?
-    let plugin: String?
-    let type: String?
-    let entityId: Int?
-    let url: String?
-    let siteId: Int?
-    let aliasId: Int?
-    let mainSiteContentId: Int?
-    let parentId: Int?
-    let lft: Int?
-    let rght: Int?
-    let level: Int?
-    let title: String?
-    let description: String?
-    let eyecatch: String?
-    let authorId: Int?
-    let layoutTemplate: String?
-    let status: Bool?
-    let publishBegin: String?
-    let publishEnd: String?
-    let selfStatus: Bool?
-    let selfPublishBegin: String?
-    let selfPublishEnd: String?
-    let excludeSearch: Bool?
-    let createdDate: String?
-    let modifiedDate: String?
-    let siteRoot: Bool?
-    let deletedDate: String?
-    let excludeMenu: Bool?
-    let blankLink: Bool?
-    let created: String?
-    let modified: String?
-    let site: SiteDetail?
+public struct ContentDetail: Codable {
+    public let id: Int
+    public let name: String?
+    public let plugin: String?
+    public let type: String?
+    public let entityId: Int?
+    public let url: String?
+    public let siteId: Int?
+    public let aliasId: Int?
+    public let mainSiteContentId: Int?
+    public let parentId: Int?
+    public let lft: Int?
+    public let rght: Int?
+    public let level: Int?
+    public let title: String?
+    public let description: String?
+    public let eyecatch: String?
+    public let authorId: Int?
+    public let layoutTemplate: String?
+    public let status: Bool?
+    public let publishBegin: String?
+    public let publishEnd: String?
+    public let selfStatus: Bool?
+    public let selfPublishBegin: String?
+    public let selfPublishEnd: String?
+    public let excludeSearch: Bool?
+    public let createdDate: String?
+    public let modifiedDate: String?
+    public let siteRoot: Bool?
+    public let deletedDate: String?
+    public let excludeMenu: Bool?
+    public let blankLink: Bool?
+    public let created: String?
+    public let modified: String?
+    public let site: SiteDetail?
 
     enum CodingKeys: String, CodingKey {
         case id, name, plugin, type, url, level, title, description, eyecatch, status, created, modified, site, lft, rght
@@ -61,27 +61,27 @@ struct ContentDetail: Codable {
 }
 
 /// baser-core Site エンティティ
-struct SiteDetail: Codable {
-    let id: Int
-    let mainSiteId: Int?
-    let name: String?
-    let displayName: String?
-    let title: String?
-    let alias: String?
-    let theme: String?
-    let status: Bool?
-    let keyword: String?
-    let description: String?
-    let useSubdomain: Bool?
-    let relateMainSite: Bool?
-    let device: String?
-    let lang: String?
-    let sameMainUrl: Bool?
-    let autoRedirect: Bool?
-    let autoLink: Bool?
-    let domainType: Int?
-    let created: String?
-    let modified: String?
+public struct SiteDetail: Codable {
+    public let id: Int
+    public let mainSiteId: Int?
+    public let name: String?
+    public let displayName: String?
+    public let title: String?
+    public let alias: String?
+    public let theme: String?
+    public let status: Bool?
+    public let keyword: String?
+    public let description: String?
+    public let useSubdomain: Bool?
+    public let relateMainSite: Bool?
+    public let device: String?
+    public let lang: String?
+    public let sameMainUrl: Bool?
+    public let autoRedirect: Bool?
+    public let autoLink: Bool?
+    public let domainType: Int?
+    public let created: String?
+    public let modified: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, title, alias, theme, status, keyword, description, device, lang, created, modified

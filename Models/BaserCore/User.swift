@@ -1,33 +1,33 @@
 /// ユーザーモデル
-struct User: Codable {
+public struct User: Codable {
     /// ユーザーID
-    let id: Int
+    public let id: Int
 
     /// ユーザー名
-    let name: String?
+    public let name: String?
 
     /// ユーザー名（実名1）
-    let realName1: String
+    public let realName1: String
 
     /// ユーザー名（実名2）
-    let realName2: String?
+    public let realName2: String?
 
     /// メールアドレス
-    let email: String
+    public let email: String
 
     /// ニックネーム
-    let nickname: String?
+    public let nickname: String?
 
     /// 作成日時
-    let created: String?
+    public let created: String?
 
     /// 更新日時
-    let modified: String?
+    public let modified: String?
 
     /// ステータス
-    let status: Bool
+    public let status: Bool
 
-    let userGroups: [UserGroup]?
+    public let userGroups: [UserGroup]?
 
     /// コーディングキー
     enum CodingKeys: String, CodingKey {
@@ -39,33 +39,33 @@ struct User: Codable {
 }
 
 /// ユーザーグループモデル
-struct UserGroup: Codable {
+public struct UserGroup: Codable {
     /// ユーザーID
-    let id: Int
+    public let id: Int
 
     /// ユーザー名
-    let name: String
+    public let name: String
 
     /// タイトル
-    let title: String
+    public let title: String
 
     /// 認証プレフィックス
-    let authPrefix: String
+    public let authPrefix: String
 
     /// 認証プレフィックス設定
-    let authPrefixSettings: String
+    public let authPrefixSettings: String
 
     /// 使用移動コンテンツ
-    let useMoveContents: Bool
+    public let useMoveContents: Bool
 
     /// 作成日時
-    let created: String?
+    public let created: String?
 
     /// 更新日時
-    let modified: String?
+    public let modified: String?
 
     /// ユーザーグループデータ
-    let joinData: UserGroupJoinData?
+    public let joinData: UserGroupJoinData?
 
     /// コーディングキー
     enum CodingKeys: String, CodingKey {
@@ -78,21 +78,21 @@ struct UserGroup: Codable {
 }
 
 /// ユーザーグループデータ
-struct UserGroupJoinData: Codable {
+public struct UserGroupJoinData: Codable {
     /// ユーザーグループID
-    let id: Int
+    public let id: Int
 
     /// ユーザーID
-    let userId: Int
+    public let userId: Int
 
     /// ユーザーグループID
-    let userGroupId: Int
+    public let userGroupId: Int
 
     /// 作成日時
-    let created: String?
+    public let created: String?
 
     /// 更新日時
-    let modified: String?
+    public let modified: String?
 
     /// コーディングキー
     enum CodingKeys: String, CodingKey {

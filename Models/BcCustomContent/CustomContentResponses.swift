@@ -1,25 +1,25 @@
 import Foundation
 
 /// GET .../custom_contents/index.json のレスポンス
-struct CustomContentsIndexResponse: Decodable {
-    let customContents: [CustomContent]?
-    let message: String?
+public struct CustomContentsIndexResponse: Decodable {
+    public let customContents: [CustomContent]?
+    public let message: String?
 }
 
 /// GET .../custom_contents/view/{id}.json のレスポンス
-struct CustomContentViewResponse: Decodable {
-    let customContent: CustomContent?
-    let message: String?
+public struct CustomContentViewResponse: Decodable {
+    public let customContent: CustomContent?
+    public let message: String?
 }
 
 /// POST .../custom_contents/add.json の content ネストオブジェクト
 /// JS SDK が content.status を content.self_status に変換するため selfStatus を使用する
-struct CustomContentAddContentRequest: Encodable {
-    let title: String
-    let name: String
-    let siteId: Int
-    let parentId: Int?
-    let selfStatus: Bool
+public struct CustomContentAddContentRequest: Encodable {
+    public let title: String
+    public let name: String
+    public let siteId: Int
+    public let parentId: Int?
+    public let selfStatus: Bool
 
     enum CodingKeys: String, CodingKey {
         case title, name
@@ -27,18 +27,33 @@ struct CustomContentAddContentRequest: Encodable {
         case parentId = "parent_id"
         case selfStatus = "self_status"
     }
+
+    /// コンストラクタ
+    public init(
+        title: String,
+        name: String,
+        siteId: Int,
+        parentId: Int? = nil,
+        selfStatus: Bool
+    ) {
+        self.title = title
+        self.name = name
+        self.siteId = siteId
+        self.parentId = parentId
+        self.selfStatus = selfStatus
+    }
 }
 
 /// POST .../custom_contents/add.json のリクエスト
-struct CustomContentAddRequest: Encodable {
-    let customTableId: Int
-    let content: CustomContentAddContentRequest
-    let description: String?
-    let template: String?
-    let widgetArea: Int?
-    let listCount: Int?
-    let listOrder: String?
-    let listDirection: String?
+public struct CustomContentAddRequest: Encodable {
+    public let customTableId: Int
+    public let content: CustomContentAddContentRequest
+    public let description: String?
+    public let template: String?
+    public let widgetArea: Int?
+    public let listCount: Int?
+    public let listOrder: String?
+    public let listDirection: String?
 
     enum CodingKeys: String, CodingKey {
         case content, description, template
@@ -48,33 +63,63 @@ struct CustomContentAddRequest: Encodable {
         case listOrder = "list_order"
         case listDirection = "list_direction"
     }
+
+    /// コンストラクタ
+    public init(
+        customTableId: Int,
+        content: CustomContentAddContentRequest,
+        description: String? = nil,
+        template: String? = nil,
+        widgetArea: Int? = nil,
+        listCount: Int? = nil,
+        listOrder: String? = nil,
+        listDirection: String? = nil
+    ) {
+        self.customTableId = customTableId
+        self.content = content
+        self.description = description
+        self.template = template
+        self.widgetArea = widgetArea
+        self.listCount = listCount
+        self.listOrder = listOrder
+        self.listDirection = listDirection
+    }
 }
 
 /// POST .../custom_contents/add.json のレスポンス
-struct CustomContentAddResponse: Decodable {
-    let customContent: CustomContent?
-    let message: String?
+public struct CustomContentAddResponse: Decodable {
+    public let customContent: CustomContent?
+    public let message: String?
 }
 
 /// POST .../custom_contents/edit/{id}.json の content ネストオブジェクト
-struct CustomContentEditContentRequest: Encodable {
-    let title: String?
-    let selfStatus: Bool?
+public struct CustomContentEditContentRequest: Encodable {
+    public let title: String?
+    public let selfStatus: Bool?
 
     enum CodingKeys: String, CodingKey {
         case title
         case selfStatus = "self_status"
     }
+
+    /// コンストラクタ
+    public init(
+        title: String? = nil,
+        selfStatus: Bool? = nil
+    ) {
+        self.title = title
+        self.selfStatus = selfStatus
+    }
 }
 
 /// POST .../custom_contents/edit/{id}.json のリクエスト
-struct CustomContentEditRequest: Encodable {
-    let content: CustomContentEditContentRequest?
-    let description: String?
-    let template: String?
-    let listCount: Int?
-    let listOrder: String?
-    let listDirection: String?
+public struct CustomContentEditRequest: Encodable {
+    public let content: CustomContentEditContentRequest?
+    public let description: String?
+    public let template: String?
+    public let listCount: Int?
+    public let listOrder: String?
+    public let listDirection: String?
 
     enum CodingKeys: String, CodingKey {
         case content, description, template
@@ -82,10 +127,27 @@ struct CustomContentEditRequest: Encodable {
         case listOrder = "list_order"
         case listDirection = "list_direction"
     }
+
+    /// コンストラクタ
+    public init(
+        content: CustomContentEditContentRequest? = nil,
+        description: String? = nil,
+        template: String? = nil,
+        listCount: Int? = nil,
+        listOrder: String? = nil,
+        listDirection: String? = nil
+    ) {
+        self.content = content
+        self.description = description
+        self.template = template
+        self.listCount = listCount
+        self.listOrder = listOrder
+        self.listDirection = listDirection
+    }
 }
 
 /// POST .../custom_contents/edit/{id}.json のレスポンス
-struct CustomContentEditResponse: Decodable {
-    let customContent: CustomContent?
-    let message: String?
+public struct CustomContentEditResponse: Decodable {
+    public let customContent: CustomContent?
+    public let message: String?
 }

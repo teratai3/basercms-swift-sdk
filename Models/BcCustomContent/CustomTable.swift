@@ -1,13 +1,13 @@
 /// カスタムテーブルモデル
-struct CustomTable: Codable {
-    let id: Int
-    let type: String?
-    let name: String?
-    let title: String?
-    let displayField: String?
-    let hasChild: Bool?
-    let created: String?
-    let modified: String?
+public struct CustomTable: Codable {
+    public let id: Int
+    public let type: String?
+    public let name: String?
+    public let title: String?
+    public let displayField: String?
+    public let hasChild: Bool?
+    public let created: String?
+    public let modified: String?
 
     enum CodingKeys: String, CodingKey {
         case id, type, name, title, created, modified

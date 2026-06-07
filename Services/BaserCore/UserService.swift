@@ -1,10 +1,15 @@
 /// ユーザー関連の API を扱うサービス
-struct UserService {
-    let client: ApiClient
+public struct UserService {
+    public let client: ApiClient
+
+    /// コンストラクタ
+    public init(client: ApiClient) {
+        self.client = client
+    }
 
     /// ユーザー一覧を取得する
     /// - Returns: ユーザーの配列（該当なしの場合は空配列）
-    func getUsers() async throws -> [User] {
+    public func getUsers() async throws -> [User] {
         let res: UsersIndexResponse = try await client.getIndex(route: .users)
         return res.users ?? []
     }
@@ -12,7 +17,7 @@ struct UserService {
     /// 単一ユーザーを取得する
     /// - Parameter id: ユーザー ID
     /// - Returns: 該当するユーザー
-    func getUser(id: Int) async throws -> User {
+    public func getUser(id: Int) async throws -> User {
         let res: UserViewResponse = try await client.getView(route: .users, id: id)
         guard let user = res.user else {
             throw BcError.notFound(resource: "ユーザー", identifier: String(id))
@@ -23,7 +28,7 @@ struct UserService {
     /// メールアドレスからユーザーを取得する
     /// - Parameter email: メールアドレス
     /// - Returns: 該当するユーザー
-    func getUserByEmail(email: String) async throws -> User {
+    public func getUserByEmail(email: String) async throws -> User {
         let res: UsersIndexResponse = try await client.getIndex(route: .users, query: ["email": email])
         guard let user = res.users?.first else {
             throw BcError.notFound(resource: "ユーザー", identifier: email)
@@ -34,7 +39,7 @@ struct UserService {
     /// ユーザーを追加する
     /// - Parameter request: 追加するユーザーの情報
     /// - Returns: 追加したユーザー
-    func addUser(_ request: UserAddRequest) async throws -> User {
+    public func addUser(_ request: UserAddRequest) async throws -> User {
         let res: UserSaveResponse = try await client.add(route: .users, data: request)
         guard let user = res.user else {
             throw BcError.notFound(resource: "ユーザー", identifier: request.email)
@@ -46,7 +51,7 @@ struct UserService {
     /// - Parameter id: ユーザー ID
     /// - Parameter request: 編集するユーザーの情報
     /// - Returns: 編集したユーザー
-    func editUser(id: Int, _ request: UserEditRequest) async throws -> User {
+    public func editUser(id: Int, _ request: UserEditRequest) async throws -> User {
         let res: UserSaveResponse = try await client.edit(route: .users, id: id, data: request)
         guard let user = res.user else {
             throw BcError.notFound(resource: "ユーザー", identifier: String(id))
@@ -56,7 +61,7 @@ struct UserService {
 
     /// ユーザーを削除する
     /// - Parameter id: ユーザー ID
-    func deleteUser(id: Int) async throws {
+    public func deleteUser(id: Int) async throws {
         try await client.delete(route: .users, id: id)
     }
 }

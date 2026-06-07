@@ -1,16 +1,16 @@
 /// カスタムコンテンツモデル
-struct CustomContent: Codable {
-    let id: Int
-    let customTableId: Int?
-    let description: String?
-    let template: String?
-    let widgetArea: Int?
-    let listCount: Int?
-    let listOrder: String?
-    let listDirection: String?
-    let created: String?
-    let modified: String?
-    let content: ContentDetail?
+public struct CustomContent: Codable {
+    public let id: Int
+    public let customTableId: Int?
+    public let description: String?
+    public let template: String?
+    public let widgetArea: Int?
+    public let listCount: Int?
+    public let listOrder: String?
+    public let listDirection: String?
+    public let created: String?
+    public let modified: String?
+    public let content: ContentDetail?
 
     enum CodingKeys: String, CodingKey {
         case id, description, template, created, modified, content

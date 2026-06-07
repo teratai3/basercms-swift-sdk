@@ -1,35 +1,42 @@
 import Foundation
 
 /// GET /baser/api/admin/baser-core/users/index.json のレスポンス
-struct UsersIndexResponse: Decodable {
-    let users: [User]?
-    let message: String?
+public struct UsersIndexResponse: Decodable {
+    public let users: [User]?
+    public let message: String?
 }
 
 /// GET /baser/api/admin/baser-core/users/view/{id}.json のレスポンス
-struct UserViewResponse: Decodable {
-    let user: User?
-    let message: String?
+public struct UserViewResponse: Decodable {
+    public let user: User?
+    public let message: String?
 }
 
 /// POST /baser/api/admin/baser-core/users/add.json のリクエスト
-struct UserAddRequest: Encodable {
-    let name: String?
-    let email: String
-    let password1: String
-    let password2: String
-    let realName1: String
-    let realName2: String?
-    let nickname: String?
-    let status: Bool
-    let userGroups: UserGroups
+public struct UserAddRequest: Encodable {
+    public let name: String?
+    public let email: String
+    public let password1: String
+    public let password2: String
+    public let realName1: String
+    public let realName2: String?
+    public let nickname: String?
+    public let status: Bool
+    public let userGroups: UserGroups
 
     /// user_groups._ids
-    struct UserGroups: Encodable {
-        let ids: [Int]
+    public struct UserGroups: Encodable {
+        public let ids: [Int]
 
         enum CodingKeys: String, CodingKey {
             case ids = "_ids"
+        }
+
+        /// コンストラクタ
+        public init(
+            ids: [Int]
+        ) {
+            self.ids = ids
         }
     }
 
@@ -41,20 +48,43 @@ struct UserAddRequest: Encodable {
         case realName2 = "real_name_2"
         case userGroups = "user_groups"
     }
+
+    /// コンストラクタ
+    public init(
+        name: String? = nil,
+        email: String,
+        password1: String,
+        password2: String,
+        realName1: String,
+        realName2: String? = nil,
+        nickname: String? = nil,
+        status: Bool,
+        userGroups: UserGroups
+    ) {
+        self.name = name
+        self.email = email
+        self.password1 = password1
+        self.password2 = password2
+        self.realName1 = realName1
+        self.realName2 = realName2
+        self.nickname = nickname
+        self.status = status
+        self.userGroups = userGroups
+    }
 }
 
 /// POST /baser/api/admin/baser-core/users/edit/{id}.json のリクエスト
-struct UserEditRequest: Encodable {
-    let name: String?
-    let email: String
-    let realName1: String
-    let realName2: String?
-    let nickname: String?
-    let status: Bool
-    let userGroups: UserAddRequest.UserGroups
+public struct UserEditRequest: Encodable {
+    public let name: String?
+    public let email: String
+    public let realName1: String
+    public let realName2: String?
+    public let nickname: String?
+    public let status: Bool
+    public let userGroups: UserAddRequest.UserGroups
     /// 変更する場合のみ指定（省略時は JSON に含めない）
-    let password1: String?
-    let password2: String?
+    public let password1: String?
+    public let password2: String?
 
     enum CodingKeys: String, CodingKey {
         case name, email, nickname, status
@@ -64,11 +94,34 @@ struct UserEditRequest: Encodable {
         case realName2 = "real_name_2"
         case userGroups = "user_groups"
     }
+
+    /// コンストラクタ
+    public init(
+        name: String? = nil,
+        email: String,
+        realName1: String,
+        realName2: String? = nil,
+        nickname: String? = nil,
+        status: Bool,
+        userGroups: UserAddRequest.UserGroups,
+        password1: String? = nil,
+        password2: String? = nil
+    ) {
+        self.name = name
+        self.email = email
+        self.realName1 = realName1
+        self.realName2 = realName2
+        self.nickname = nickname
+        self.status = status
+        self.userGroups = userGroups
+        self.password1 = password1
+        self.password2 = password2
+    }
 }
 
 /// POST .../users/add.json および edit/{id}.json のレスポンス（形は同じ）
-struct UserSaveResponse: Decodable {
-    let user: User?
-    let message: String?
-    let error: String?
+public struct UserSaveResponse: Decodable {
+    public let user: User?
+    public let message: String?
+    public let error: String?
 }

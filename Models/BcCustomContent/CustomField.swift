@@ -1,23 +1,23 @@
 /// カスタムフィールドモデル
-struct CustomField: Codable {
-    let id: Int
-    let name: String?
-    let title: String?
-    let type: String?
-    let status: Bool?
-    let defaultValue: String?
-    let validate: String?
-    let regex: String?
-    let regexErrorMessage: String?
-    let counter: Bool?
-    let autoConvert: String?
-    let placeholder: String?
-    let size: Int?
-    let line: Int?
-    let maxLength: Int?
-    let source: String?
-    let created: String?
-    let modified: String?
+public struct CustomField: Codable {
+    public let id: Int
+    public let name: String?
+    public let title: String?
+    public let type: String?
+    public let status: Bool?
+    public let defaultValue: String?
+    public let validate: String?
+    public let regex: String?
+    public let regexErrorMessage: String?
+    public let counter: Bool?
+    public let autoConvert: String?
+    public let placeholder: String?
+    public let size: Int?
+    public let line: Int?
+    public let maxLength: Int?
+    public let source: String?
+    public let created: String?
+    public let modified: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, title, type, status, validate, regex, counter, placeholder, size, line, source, created, modified

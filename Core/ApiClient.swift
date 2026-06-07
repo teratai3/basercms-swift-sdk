@@ -1,7 +1,7 @@
 import Foundation
 
 /// baserCMS API クライアント
-final class ApiClient {
+public final class ApiClient {
     /// 基底 URL
     private let baseURL: URL
 
@@ -12,12 +12,12 @@ final class ApiClient {
     private var refreshToken: String?
 
     /// コンストラクタ
-    init(baseURL: URL) {
+    public init(baseURL: URL) {
         self.baseURL = baseURL
     }
 
     /// ログイン（POST .../users/login.json）
-    func login(email: String, password: String) async throws {
+    public func login(email: String, password: String) async throws {
         let httpBody = try JSONEncoder().encode(["email": email, "password": password])
         let json: LoginResponse = try await send(
             path: "baser/api/admin/baser-core/users/login.json",
@@ -30,7 +30,7 @@ final class ApiClient {
     }
 
     /// アクセストークンをリフレッシュする（GET .../users/refresh_token.json）
-    func refreshAccessToken() async throws {
+    public func refreshAccessToken() async throws {
         guard let token = refreshToken else {
             throw BcError.authenticationFailed
         }
@@ -45,7 +45,7 @@ final class ApiClient {
     }
 
     /// ログアウト（トークンをクリアする）
-    func logout() {
+    public func logout() {
         accessToken = nil
         refreshToken = nil
     }
@@ -53,7 +53,7 @@ final class ApiClient {
     /// 一覧を取得する（GET .../index.json）
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
-    func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
+    public func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
         try await send(path: "\(route.basePath)/index.json", method: "GET", query: query)
     }
 
@@ -62,7 +62,7 @@ final class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     /// - Returns: デコードしたレスポンス
-    func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
+    public func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
         try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
     }
 
@@ -74,7 +74,7 @@ final class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func add<T: Encodable, R: Decodable>(
+    public func add<T: Encodable, R: Decodable>(
         route: Route,
         data: T,
         files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
@@ -104,7 +104,7 @@ final class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func edit<T: Encodable, R: Decodable>(
+    public func edit<T: Encodable, R: Decodable>(
         route: Route,
         id: Int,
         data: T,
@@ -131,7 +131,7 @@ final class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
-    func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
+    public func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
         struct Empty: Decodable {}
         let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
     }
@@ -142,7 +142,7 @@ final class ApiClient {
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
+    public func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
         try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
     }
 
