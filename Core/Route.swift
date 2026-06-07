@@ -26,7 +26,6 @@ public struct Route: Equatable {
     /// API のベースパス
     /// - admin: baser/api/admin/{plugin}/{controller}
     /// - front: baser/api/{plugin}/{controller}
-    /// - custom: {prefix}/{plugin}/{controller}
     public var basePath: String {
         switch apiType {
         case .admin:
