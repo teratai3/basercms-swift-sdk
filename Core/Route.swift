@@ -23,6 +23,11 @@ public struct Route: Equatable {
     public static let customContents = Route(plugin: "bc-custom-content", controller: "custom_contents")
     public static let customLinks = Route(plugin: "bc-custom-content", controller: "custom_links")
 
+    /// 認証が必要か（admin のみ要認証、front は公開 API なので不要）
+    public var requiresAuth: Bool {
+        apiType == .admin
+    }
+
     /// API のベースパス
     /// - admin: baser/api/admin/{plugin}/{controller}
     /// - front: baser/api/{plugin}/{controller}

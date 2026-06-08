@@ -53,8 +53,8 @@ open class ApiClient {
     /// 一覧を取得する（GET .../index.json）
     /// - Parameter route: リソースのルート
     /// - Returns: デコードしたレスポンス
-    func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
-        try await send(path: "\(route.basePath)/index.json", method: "GET", query: query)
+    public func getIndex<T: Decodable>(route: Route, query: [String: String] = [:]) async throws -> T {
+        try await send(path: "\(route.basePath)/index.json", method: "GET", requiresAuth: route.requiresAuth, query: query)
     }
 
     /// 単一リソースを取得する（GET .../view/{id}.json）
@@ -62,8 +62,8 @@ open class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     /// - Returns: デコードしたレスポンス
-    func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
-        try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", query: query)
+    public func getView<T: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> T {
+        try await send(path: "\(route.basePath)/view/\(id).json", method: "GET", requiresAuth: route.requiresAuth, query: query)
     }
 
     /// リソースを追加する（POST .../add.json）
@@ -74,7 +74,7 @@ open class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func add<T: Encodable, R: Decodable>(
+    public func add<T: Encodable, R: Decodable>(
         route: Route,
         data: T,
         files: [(name: String, data: Data, fileName: String, mimeType: String)] = [],
@@ -82,7 +82,7 @@ open class ApiClient {
     ) async throws -> R {
         if files.isEmpty {
             let httpBody = try JSONEncoder().encode(data)
-            return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, query: query)
+            return try await send(path: "\(route.basePath)/add.json", method: "POST", httpBody: httpBody, requiresAuth: route.requiresAuth, query: query)
         } else {
             let (boundary, body) = try buildMultipartRequest(data: data, files: files)
             return try await send(
@@ -90,6 +90,7 @@ open class ApiClient {
                 method: "POST",
                 httpBody: body,
                 contentType: "multipart/form-data; boundary=\(boundary)",
+                requiresAuth: route.requiresAuth,
                 query: query
             )
         }
@@ -104,7 +105,7 @@ open class ApiClient {
     ///   - files: アップロードするファイルの配列（省略時は空）
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func edit<T: Encodable, R: Decodable>(
+    public func edit<T: Encodable, R: Decodable>(
         route: Route,
         id: Int,
         data: T,
@@ -113,7 +114,7 @@ open class ApiClient {
     ) async throws -> R {
         if files.isEmpty {
             let httpBody = try JSONEncoder().encode(data)
-            return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, query: query)
+            return try await send(path: "\(route.basePath)/edit/\(id).json", method: "POST", httpBody: httpBody, requiresAuth: route.requiresAuth, query: query)
         } else {
             let (boundary, body) = try buildMultipartRequest(data: data, files: files)
             return try await send(
@@ -121,6 +122,7 @@ open class ApiClient {
                 method: "POST",
                 httpBody: body,
                 contentType: "multipart/form-data; boundary=\(boundary)",
+                requiresAuth: route.requiresAuth,
                 query: query
             )
         }
@@ -131,9 +133,9 @@ open class ApiClient {
     ///   - route: リソースのルート
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
-    func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
+    public func delete(route: Route, id: Int, query: [String: String] = [:]) async throws {
         struct Empty: Decodable {}
-        let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
+        let _: Empty = try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", requiresAuth: route.requiresAuth, query: query)
     }
 
     /// リソースを削除し、レスポンスを返す（POST .../delete/{id}.json）
@@ -142,8 +144,8 @@ open class ApiClient {
     ///   - id: リソースの ID
     ///   - query: クエリパラメーター
     /// - Returns: デコードしたレスポンス
-    func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
-        try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", query: query)
+    public func delete<R: Decodable>(route: Route, id: Int, query: [String: String] = [:]) async throws -> R {
+        try await send(path: "\(route.basePath)/delete/\(id).json", method: "POST", requiresAuth: route.requiresAuth, query: query)
     }
 
     /// Encodable なリクエストを multipart/form-data ボディに変換する
